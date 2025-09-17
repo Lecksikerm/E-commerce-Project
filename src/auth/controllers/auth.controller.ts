@@ -12,7 +12,7 @@ import { Request } from 'express';
 import { SignUpDto } from '../dto/auth.dto';
 import { AuthService, AuthInput } from '../services/auth.service';
 import { AuthGuard } from '../guards/auth-guard';
-import { AuthGuard as PassportAuthGuard } from '@nestjs/passport'; // ✅ Built-in passport guard
+import { AuthGuard as PassportAuthGuard } from '@nestjs/passport'; //  Built-in passport guard
 
 @Controller('auth')
 export class AuthController {
