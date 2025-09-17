@@ -37,7 +37,7 @@ export class AuthService {
     return { userId: user.userId, username: user.username };
   }
 
-  /** 📝 Register a new user (in-memory) */
+  /**  Register a new user (in-memory) */
   async register(signUpDto: SignUpDto) {
     const { email, name, password } = signUpDto;
 
@@ -64,7 +64,6 @@ export class AuthService {
     };
   }
 
-  /** 🎟️ Generate JWT token */
   async signIn(user: SigninData): Promise<AuthResult> {
     const tokenPayload = { sub: user.userId, username: user.username };
     const accessToken = await this.jwtService.signAsync(tokenPayload);
