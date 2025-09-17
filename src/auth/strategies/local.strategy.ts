@@ -4,9 +4,9 @@ import { Strategy } from 'passport-local';
 import { AuthService, SigninData } from '../services/auth.service';
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy) {
+export class LocalStrategy extends PassportStrategy(Strategy, 'my-local') {
   constructor(private readonly authService: AuthService) {
-    super({ usernameField: 'username', passwordField: 'password' });
+    super({ usernameField: 'login', passwordField: 'pass' });
   }
 
   async validate(username: string, password: string): Promise<SigninData> {
