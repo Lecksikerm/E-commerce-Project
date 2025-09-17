@@ -19,16 +19,16 @@ export class AuthGuard implements CanActivate {
             throw new UnauthorizedException();
         }
         try {
-         const tokenPayload =  await this.jwtService.verifyAsync(token);
-         request.user = {
-            userId: tokenPayload.sub,
-            username: tokenPayload.username
-         }
-        return true;
-     }  catch (error) {
-        throw new UnauthorizedException();
+            const tokenPayload = await this.jwtService.verifyAsync(token);
+            request.user = {
+                userId: tokenPayload.sub,
+                username: tokenPayload.username
+            }
+            return true;
+        } catch (error) {
+            throw new UnauthorizedException();
 
-     }
+        }
 
     }
 }

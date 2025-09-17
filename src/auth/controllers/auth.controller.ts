@@ -14,7 +14,7 @@ import { AuthService, AuthInput } from '../services/auth.service';
 import { AuthGuard } from '../guards/auth-guard';
 import { AuthGuard as PassportAuthGuard } from '@nestjs/passport'; //  Built-in passport guard
 
-@Controller('auth')
+@Controller('v1/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -24,29 +24,12 @@ export class AuthController {
     return this.authService.register(signUpDto);
   }
 
-  // Temporary route to quickly create a new user "Alice"
-  @Post('/create-alice')
-  async createAlice() {
-    return this.authService.register({
-      email: 'alice@gmail.com',
-      name: 'Alice',
-      password: 'password123',
-    });
-  }
-
   // Login route using Passport Local strategy
   @UseGuards(PassportAuthGuard('local'))
   @HttpCode(HttpStatus.OK)
   @Post('/login')
   async login(@Req() req: Request) {
     return this.authService.signIn(req.user as any);
-  }
-
-  // Get current user route
-  @UseGuards(AuthGuard)
-  @Get('/me')
-  getUserInfo(@Req() request: Request) {
-    return request.user;
   }
 }
 
