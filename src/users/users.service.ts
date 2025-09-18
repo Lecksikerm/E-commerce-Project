@@ -5,6 +5,9 @@ import { User } from '../entities/user.entity';
 
 @Injectable()
 export class UsersService {
+  findUserByUsernameOrEmail(username: string) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
