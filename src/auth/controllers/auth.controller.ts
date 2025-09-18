@@ -11,12 +11,12 @@ import {
 import { Request } from 'express';
 import { SignUpDto } from '../dto/auth.dto';
 import { AuthService, AuthInput } from '../services/auth.service';
-import { AuthGuard } from '../guards/auth-guard';
+import { AuthGuard } from '../guards/auth.guard';
 import { AuthGuard as PassportAuthGuard } from '@nestjs/passport'; //  Built-in passport guard
 
 @Controller('v1/auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   // Existing signup route
   @Post('/signup')

@@ -1,16 +1,14 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../auth/guards/auth-guard'; // ✅ adjust path if needed
-import { Request } from 'express';
+import { Controller, Get, UseGuards, Req } from '@nestjs/common';
+import { AuthGuard } from './../auth/guards/auth.guard';
 
 @Controller('user')
 export class UserController {
-  constructor() {}
-
-  // ✅ Get current logged-in user
   @UseGuards(AuthGuard)
   @Get('/me')
-  getUserInfo(@Req() request: Request) {
-    return request.user;
+  getUserInfo(@Req() req: any) {
+    return req.user;
   }
 }
+
+
 
