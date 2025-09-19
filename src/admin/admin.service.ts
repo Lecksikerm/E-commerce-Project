@@ -35,20 +35,26 @@ export class AdminService {
   }
 
   async login(dto: LoginAdminDto) {
-    const admin = await this.validateAdmin(dto.email, dto.password);
-    const payload = { sub: admin.id, email: admin.email, role: 'admin' };
+  const admin = await this.validateAdmin(dto.email, dto.password);
+  const payload = { sub: admin.id, email: admin.email, role: 'admin' };
+  const { password, ...adminWithoutPassword } = admin; // Remove password
 
-    return { access_token: this.jwtService.sign(payload) };
-  }
+  return {
+    access_token: this.jwtService.sign(payload),
+    admin: adminWithoutPassword, // Only safe fields
+  };
+}
 
-  async findAll(): Promise<Admin[]> {
-    return this.adminRepo.find();
-  }
+ async findAll(): Promise<Partial<Admin>[]> {
+  const admins = await this.adminRepo.find();
+  return admins.map(({ password, ...adminWithoutPassword }) => adminWithoutPassword);
+}
 
-  async findOne(id: string): Promise<Admin> {
-    const admin = await this.adminRepo.findOne({ where: { id } });
-    if (!admin) throw new NotFoundException('Admin not found');
-    return admin;
-  }
+  async findOne(id: string): Promise<Partial<Admin>> {
+  const admin = await this.adminRepo.findOne({ where: { id } });
+  if (!admin) throw new NotFoundException('Admin not found');
+  const { password, ...adminWithoutPassword } = admin;
+  return adminWithoutPassword;
+}
 }
 

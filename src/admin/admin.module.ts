@@ -1,17 +1,15 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtModule } from '@nestjs/jwt';
 import { Admin } from './admin.entity';
 import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
+import { JwtModule } from '@nestjs/jwt'; // import only, do not register
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Admin]), 
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'adminDefaultSecret',
-      signOptions: { expiresIn: '15h' },
-    }),
+    TypeOrmModule.forFeature([Admin]),
+     forwardRef(() => AuthModule),
   ],
   controllers: [AdminController],
   providers: [AdminService],
