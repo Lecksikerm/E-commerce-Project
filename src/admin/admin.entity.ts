@@ -12,6 +12,7 @@ export class Admin extends Base {
 
   @Column()
     password!: string;
+  products: any;
 }
 
 

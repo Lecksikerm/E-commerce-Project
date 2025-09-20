@@ -1,33 +1,29 @@
 {
   "compilerOptions": {
-    /* Basic Options */
-    "target": "ES2021",                       // Modern JS output
-    "module": "commonjs",                     // Node.js compatible
-    "lib": ["ES2021"],                        // Modern JS features
-    "outDir": "./dist",                       // Compiled output folder
-    "rootDir": "./src",                       // Your source code folder
+    "target": "ES2021",
+    "module": "commonjs",
+    "lib": ["ES2021"],
+    "outDir": "./dist",
+    "rootDir": "./src",
 
-    /* Type Checking */
-    "strict": true,                           // Enable all strict type-checking
-    "noImplicitAny": true,                    // Catch implicit any
-    "strictNullChecks": true,                 // Null/undefined checks
-    "forceConsistentCasingInFileNames": true, // Prevent case-sensitive import issues
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
 
-    /* Module Resolution */
     "moduleResolution": "node",
-    "esModuleInterop": true,                  // Allow `import x from 'x'`
-    "experimentalDecorators": true,           // Required for @ decorators
-    "emitDecoratorMetadata": true,            // Required for NestJS + TypeORM
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
 
-    /* Types */
-    "types": ["node", "passport-local"],      // ✅ explicitly load passport-local & Node types
+    "types": ["node", "jest", "passport-local"],
 
-    /* Source Maps */
-    "sourceMap": true,                        // Easier debugging in VSCode
-    "skipLibCheck": true                      // Avoid type errors from dependencies
+    "sourceMap": true,
+    "skipLibCheck": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
-}
 
+
+}
 
