@@ -6,12 +6,12 @@ import {
 
 export abstract class Base {
   @PrimaryGeneratedColumn('uuid')
-  id?: string; // 👈 make optional
-  
+  id!: string;
+
   @CreateDateColumn({ type: 'timestamptz' })
-  createdAt?: Date; // 👈 make optional
+  createdAt!: Date;
 
   @UpdateDateColumn({ type: 'timestamptz' })
-  updatedAt?: Date; // 👈 make optional
+  updatedAt!: Date;
 }
 

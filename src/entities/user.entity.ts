@@ -1,10 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Base } from './base.entity';
+import { Product } from './product.entity';
 
 @Entity({ name: 'users' })
 export class User extends Base {
-  @PrimaryGeneratedColumn()
-  userId!: number;
+  @PrimaryGeneratedColumn('uuid') // Primary key
+  id!: string;
 
   @Column({ type: 'varchar', unique: true })
   email!: string;
@@ -18,9 +19,19 @@ export class User extends Base {
   @Column({ type: 'varchar', unique: true })
   username!: string;
 
-  @Column({ type: 'varchar', default: 'user' }) //  FIX: add @Column and default
+  @Column({ type: 'varchar', default: 'user' })
   role!: string;
+
+  @OneToMany(() => Product, (product) => product.createdBy)
+  products!: Product[];
+  userId: any;
 }
+
+
+
+
+
+
 
 
 
