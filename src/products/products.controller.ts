@@ -13,13 +13,13 @@ import {
 import { ProductsService } from './products.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateProductDto } from './dto/create-product.dto';
-import { Admin } from '../admin/admin.entity';
+import { Admin } from '../dal/entities/admin.entity';
 
 @Controller('products')
 export class ProductsController {
   private readonly logger = new Logger(ProductsController.name);
 
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ProductsService) { }
 
   @Get('/')
   async findAll() {
