@@ -1,6 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Admin } from './admin.entity';
+import { Admin } from '../dal/entities/admin.entity';
 import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
 import { JwtModule } from '@nestjs/jwt'; // import only, do not register
@@ -9,11 +9,11 @@ import { AuthModule } from '../auth/auth.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Admin]),
-     forwardRef(() => AuthModule),
+    forwardRef(() => AuthModule),
   ],
   controllers: [AdminController],
   providers: [AdminService],
   exports: [AdminService],
 })
-export class AdminModule {}
+export class AdminModule { }
 

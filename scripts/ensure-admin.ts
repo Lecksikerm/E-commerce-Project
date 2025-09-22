@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { User } from  '../entities/user.entity';
+import { User } from '../src/dal/entities/user.entity';
 import * as bcrypt from 'bcrypt';
 
 async function ensureAdmin() {

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { Admin } from './admin.entity';
+import { Admin } from '../dal/entities/admin.entity';
 import { CreateAdminDto, LoginAdminDto } from './admin.dto';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class AdminService {
     @InjectRepository(Admin)
     private readonly adminRepo: Repository<Admin>,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async createAdmin(dto: CreateAdminDto): Promise<Admin> {
     // ✅ Prevent duplicate admin email
@@ -35,26 +35,26 @@ export class AdminService {
   }
 
   async login(dto: LoginAdminDto) {
-  const admin = await this.validateAdmin(dto.email, dto.password);
-  const payload = { sub: admin.id, email: admin.email, role: 'admin' };
-  const { password, ...adminWithoutPassword } = admin; // Remove password
+    const admin = await this.validateAdmin(dto.email, dto.password);
+    const payload = { sub: admin.id, email: admin.email, role: 'admin' };
+    const { password, ...adminWithoutPassword } = admin; // Remove password
 
-  return {
-    access_token: this.jwtService.sign(payload),
-    admin: adminWithoutPassword, // Only safe fields
-  };
-}
+    return {
+      access_token: this.jwtService.sign(payload),
+      admin: adminWithoutPassword, // Only safe fields
+    };
+  }
 
- async findAll(): Promise<Partial<Admin>[]> {
-  const admins = await this.adminRepo.find();
-  return admins.map(({ password, ...adminWithoutPassword }) => adminWithoutPassword);
-}
+  async findAll(): Promise<Partial<Admin>[]> {
+    const admins = await this.adminRepo.find();
+    return admins.map(({ password, ...adminWithoutPassword }) => adminWithoutPassword);
+  }
 
   async findOne(id: string): Promise<Partial<Admin>> {
-  const admin = await this.adminRepo.findOne({ where: { id } });
-  if (!admin) throw new NotFoundException('Admin not found');
-  const { password, ...adminWithoutPassword } = admin;
-  return adminWithoutPassword;
-}
+    const admin = await this.adminRepo.findOne({ where: { id } });
+    if (!admin) throw new NotFoundException('Admin not found');
+    const { password, ...adminWithoutPassword } = admin;
+    return adminWithoutPassword;
+  }
 }
 

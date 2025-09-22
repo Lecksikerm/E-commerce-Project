@@ -1,17 +1,17 @@
 import { Entity, Column } from 'typeorm';
 
-import { Base } from '../entities/base.entity';
+import { Base } from './base.entity';
 
 @Entity('admin')
 export class Admin extends Base {
   @Column({ unique: true })
-    email!: string;
+  email: string | undefined;
 
   @Column({ unique: true })
-    name!: string;
+  name: string;
 
-  @Column()
-    password!: string;
+  @Column({ select: false })
+  password!: string;
   products: any;
 }
 

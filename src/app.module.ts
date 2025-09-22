@@ -5,14 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import { User } from './entities/user.entity';
-import { Admin } from './admin/admin.entity'; //  Make sure you have this entity
+import { User } from './dal/entities/user.entity';
+import { Admin } from './dal/entities/admin.entity'; //  Make sure you have this entity
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { ProductsModule } from './products/products.module';
-import { Product } from './entities/product.entity';
-import { Category } from './entities/category.entity';
+import { Product } from './dal/entities/product.entity';
+import { Category } from './dal/entities/category.entity';
 
 @Module({
   imports: [
@@ -45,7 +45,7 @@ import { Category } from './entities/category.entity';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
 
 
 

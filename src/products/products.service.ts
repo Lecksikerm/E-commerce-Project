@@ -2,8 +2,8 @@ import { Injectable, Logger, UnauthorizedException, NotFoundException } from '@n
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
-import { Product } from '../entities/product.entity';
-import { Admin } from '../admin/admin.entity';
+import { Product } from '../dal/entities/product.entity';
+import { Admin } from '../dal/entities/admin.entity';
 
 @Injectable()
 export class ProductsService {
@@ -12,7 +12,7 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
-  ) {}
+  ) { }
 
   async findAll(): Promise<Product[]> {
     this.logger.log('Fetching all products from DB...');

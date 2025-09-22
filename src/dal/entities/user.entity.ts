@@ -5,25 +5,25 @@ import { Product } from './product.entity';
 @Entity({ name: 'users' })
 export class User extends Base {
   @PrimaryGeneratedColumn('uuid') // Primary key
-  id!: string;
+  id: string;
 
   @Column({ type: 'varchar', unique: true })
-  email!: string;
+  email: string;
 
   @Column({ type: 'varchar' })
-  password!: string;
+  password: string;
 
   @Column({ type: 'varchar', nullable: true })
-  name?: string;
+  name: string;
 
   @Column({ type: 'varchar', unique: true })
-  username!: string;
+  username: string;
 
   @Column({ type: 'varchar', default: 'user' })
-  role!: string;
+  role: string;
 
   @OneToMany(() => Product, (product) => product.createdBy)
-  products!: Product[];
+  products: Product[];
   userId: any;
 }
 
