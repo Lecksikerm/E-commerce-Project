@@ -3,101 +3,81 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
   Req,
   UseGuards,
-  Logger,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CreateProductDto } from './dto/create-product.dto';
+import { ProductDto } from './dto/product.dto';
 import { Admin } from '../dal/entities/admin.entity';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
+import { Product } from '../dal/entities/product.entity';
+import { UpdateProductDto } from 'src/auth/dto/auth.dto';
 
+@ApiTags('Products')
 @Controller('products')
 export class ProductsController {
-  private readonly logger = new Logger(ProductsController.name);
+  constructor(private readonly productsService: ProductsService) {}
 
-  constructor(private readonly productsService: ProductsService) { }
-
+  /** Get all products */
   @Get('/')
+  @ApiOperation({ summary: 'Get all products' })
+  @ApiResponse({ status: 200, description: 'List of all products', type: [Product] })
   async findAll() {
-    this.logger.log('Fetching all products...');
-    try {
-      const products = await this.productsService.findAll();
-      this.logger.log(`Found ${products.length} products`);
-      return products;
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        this.logger.error('Error fetching products', error.stack);
-      } else {
-        this.logger.error('Unknown error fetching products', JSON.stringify(error));
-      }
-      throw error;
-    }
+    return this.productsService.getAll();
   }
 
+  /** Create a new product (Admin only) */
   @UseGuards(JwtAuthGuard)
-  @Post()
-  async create(@Body() dto: CreateProductDto, @Req() req: any) {
-    const admin: Admin = req.user; // JWT should contain admin info
-    this.logger.log(`Creating product by admin ID: ${admin.id}`);
-    try {
-      const product = await this.productsService.create(dto, admin);
-      this.logger.log(`Product created with ID: ${product.id}`);
-      return product;
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        this.logger.error('Error creating product', error.stack);
-      } else {
-        this.logger.error('Unknown error creating product', JSON.stringify(error));
-      }
-      throw error;
-    }
+  @Post('/')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Create a product (Admin only)' })
+  @ApiBody({ type: ProductDto })
+  @ApiResponse({ status: 201, description: 'Product created successfully', type: Product })
+  async create(@Body() dto: ProductDto, @Req() req: any) {
+    const admin: Admin = req.user; // injected by JwtStrategy
+    return this.productsService.create(dto, admin);
   }
 
+  /** Update a product (Admin only) */
   @UseGuards(JwtAuthGuard)
-  @Patch('/:id')
+  @Patch(':id')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Update a product (Admin only)' })
+  @ApiBody({ type: UpdateProductDto, description: 'Partial update allowed' })
+  @ApiResponse({ status: 200, description: 'Product updated successfully', type: Product })
   async update(
     @Param('id') id: string,
-    @Body() dto: Partial<CreateProductDto>,
+    @Body() dto: UpdateProductDto,
     @Req() req: any,
   ) {
-    const admin: Admin = req.user;
-    this.logger.log(`Updating product ID: ${id} by admin ID: ${admin.id}`);
-    try {
-      const updated = await this.productsService.update(id, dto, admin);
-      this.logger.log(`Product updated: ${JSON.stringify(updated)}`);
-      return updated;
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        this.logger.error(`Error updating product ID: ${id}`, error.stack);
-      } else {
-        this.logger.error(`Unknown error updating product ID: ${id}`, JSON.stringify(error));
-      }
-      throw error;
+    if (!req.user) {
+      throw new NotFoundException('Admin user not found in request');
     }
+
+    const admin: Admin = req.user;
+    return this.productsService.update(id, dto, admin);
   }
 
+  /** Delete a product (Admin only) */
   @UseGuards(JwtAuthGuard)
-  @Delete('/:id')
+  @Delete(':id')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Delete a product (Admin only)' })
+  @ApiResponse({ status: 200, description: 'Product deleted successfully' })
   async remove(@Param('id') id: string, @Req() req: any) {
-    const admin: Admin = req.user;
-    this.logger.log(`Deleting product ID: ${id} by admin ID: ${admin.id}`);
-    try {
-      const result = await this.productsService.remove(id, admin);
-      this.logger.log(`Product deleted: ${JSON.stringify(result)}`);
-      return result;
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        this.logger.error(`Error deleting product ID: ${id}`, error.stack);
-      } else {
-        this.logger.error(`Unknown error deleting product ID: ${id}`, JSON.stringify(error));
-      }
-      throw error;
+    if (!req.user) {
+      throw new NotFoundException('Admin user not found in request');
     }
+
+    const admin: Admin = req.user;
+    return this.productsService.remove(id, admin);
   }
 }
+
 
 

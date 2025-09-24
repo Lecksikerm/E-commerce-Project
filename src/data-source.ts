@@ -5,7 +5,7 @@ import { Category } from "./dal/entities/category.entity"; // adjust path
 import { User } from "./dal/entities/user.entity";
 import { Admin } from "./dal/entities/admin.entity";
 
-export const AppDataSource = new DataSource({
+export const dataSource = new DataSource({
     type: "postgres",
     host: "localhost",
     port: 5432,

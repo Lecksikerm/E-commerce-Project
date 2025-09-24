@@ -17,10 +17,23 @@ export class Product extends Base {
   @Column({ type: 'text', nullable: true })
   img: string | null;
 
+  @Column({ type: 'text', nullable: true })
+  description: string | null;
+
+  // Category relation
   @ManyToOne(() => Category, { nullable: true, eager: true })
   @JoinColumn({ name: 'categoryId' })
   category: Category;
-  createdBy: any;
 
- 
+  @Column({ type: 'uuid', nullable: true })
+  categoryId: string | null; // Optional explicit column if needed
+
+  // Admin relation
+  @ManyToOne(() => Admin, admin => admin.products, { eager: true })
+  @JoinColumn({ name: 'createdById' })
+  createdBy: Admin;
 }
+
+
+
+

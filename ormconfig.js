@@ -10,4 +10,4 @@ const config = {
     entities: ["User"],
     synchronize: true,
 };
-//# sourceMappingURL=ormconfig.js.                                                                                                                                            
+//# sourceMappingURL=ormconfig.js.map
