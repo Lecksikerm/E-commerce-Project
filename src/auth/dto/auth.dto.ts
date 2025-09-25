@@ -81,18 +81,18 @@ export class LoginDto extends PasswordDto {
  */
 
 export class AdminSignUpDto {
-  @ApiProperty({ example: 'admin2@gmail.com', description: 'Admin email' })
+  @ApiProperty({ example: 'admin3@gmail.com', description: 'Admin email' })
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty({ example: 'admin2', description: 'Full name of the admin' })
+  @ApiProperty({ example: 'admin3', description: 'Full name of the admin' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(60)
   name: string;
 
-  @ApiProperty({ example: '123456', description: 'Password 6-64 chars' })
+  @ApiProperty({ example: '1234560', description: 'Password 6-64 chars' })
   @IsString()
   @IsNotEmpty()
   @MinLength(6)

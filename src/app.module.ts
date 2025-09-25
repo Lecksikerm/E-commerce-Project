@@ -16,12 +16,12 @@ import { Category } from './dal/entities/category.entity';
 
 @Module({
   imports: [
-    // ✅ Load .env configuration globally
+    //  Load .env configuration globally
     ConfigModule.forRoot({
       isGlobal: true,
     }),
 
-    // ✅ Configure TypeORM
+    //  Configure TypeORM
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
         type: 'postgres',

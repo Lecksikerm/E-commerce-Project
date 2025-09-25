@@ -19,7 +19,7 @@ async function bootstrap() {
   const projectName = 'e-commerce';
   const port = process.env.PORT || 8000;
 
-  // Use global validation pipes
+  // ✅ Global validation pipes
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -28,25 +28,29 @@ async function bootstrap() {
     }),
   );
 
-  // Swagger configuration
+  // ✅ Swagger configuration with separate user & admin BearerAuth
   const swaggerConfig = new DocumentBuilder()
     .setTitle('E-Commerce API')
     .setDescription('API documentation for the e-commerce project')
     .setVersion('1.0')
+    // User JWT token
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
-      'access-token',
+      'user-token',
+    )
+    // Admin JWT token
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'admin-token',
     )
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
 
-  
   SwaggerModule.setup('swagger', app, document, {
     swaggerOptions: { persistAuthorization: true },
   });
 
-  
   await app.listen(port);
 
   logger.log('--------- Application Started ---------');
@@ -55,6 +59,3 @@ async function bootstrap() {
 }
 
 bootstrap();
-
-
-

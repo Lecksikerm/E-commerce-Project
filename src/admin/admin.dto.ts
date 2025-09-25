@@ -3,24 +3,24 @@ import { IsEmail, IsNotEmpty, MinLength, MaxLength, IsString } from 'class-valid
 
 /** Admin Sign-up DTO */
 export class CreateAdminDto {
-  @ApiProperty({ example: 'admin2@gmail.com', description: 'Admin email' })
+  @ApiProperty({ example: 'admin3@gmail.com', description: 'Admin email' })
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty({ example: 'Admin Two', description: 'Full name of the admin' })
+  @ApiProperty({ example: 'Admin Three', description: 'Full name of the admin' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(60)
   name: string;
 
-  @ApiProperty({ example: 'admin2', description: 'Username of the admin' })
+  @ApiProperty({ example: 'admin3', description: 'Username of the admin' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(30)
   username: string;
 
-  @ApiProperty({ example: '123456', description: 'Password 6-64 chars' })
+  @ApiProperty({ example: '1234560', description: 'Password 6-64 chars' })
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
@@ -35,12 +35,12 @@ export class CreateAdminDto {
 
 /** Admin Login DTO */
 export class LoginAdminDto {
-  @ApiProperty({ example: 'admin2@gmail.com', description: 'Admin email' })
+  @ApiProperty({ example: 'admin3@gmail.com', description: 'Admin email' })
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty({ example: '123456', description: 'Password 6-64 chars' })
+  @ApiProperty({ example: '1234560', description: 'Password 6-64 chars' })
   @IsString()
   @IsNotEmpty()
   @MinLength(6)

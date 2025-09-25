@@ -1,31 +1,20 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
-
-// Extend Express Request interface to include 'admin'
-declare module 'express-serve-static-core' {
-  interface Request {
-    admin?: any;
-  }
-}
+import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { Admin } from '../dal/entities/admin.entity';
 
 @Injectable()
-export class AdminGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+export class AdminGuard extends AuthGuard('admin-jwt') {
+  canActivate(context: ExecutionContext) {
+    // Calls the Passport strategy to validate the token
+    return super.canActivate(context);
+  }
 
-  canActivate(context: ExecutionContext): boolean {
-    const req = context.switchToHttp().getRequest<Request>();
-    const authHeader = req.headers['authorization'];
-    if (!authHeader) throw new UnauthorizedException('Token missing');
+  handleRequest<TUser = any>(err: any, user: TUser, info: any, context: ExecutionContext, status?: any): TUser {
 
-    const token = authHeader.split(' ')[1];
-    try {
-      const payload = this.jwtService.verify(token);
-      if (payload.role !== 'admin') throw new UnauthorizedException('Admin only');
-      req['admin'] = payload; 
-      return true;
-    } catch {
-      throw new UnauthorizedException('Invalid token');
+    if (err || !user) {
+      throw err || new UnauthorizedException('Admin authentication failed');
     }
+    return user; // This will be assigned to req.user in the controller
   }
 }
+

@@ -1,15 +1,16 @@
 import { Controller, Post, Body, Get, Param, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CreateAdminDto, LoginAdminDto } from './admin.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { AdminJwtAuthGuard } from 'src/auth/guards/admin-jwt.guard';
+import { AdminGuard } from './admin.guard';
 
 @ApiTags('Admin')
 @Controller('/admin')
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(private readonly adminService: AdminService) { }
 
-  /** Register a new admin */
+  // ✅ Public endpoint (no guard)
   @Post('/register')
   @ApiOperation({ summary: 'Register a new admin' })
   @ApiBody({ type: CreateAdminDto })
@@ -18,7 +19,6 @@ export class AdminController {
     return this.adminService.createAdmin(dto);
   }
 
-  /** Admin login */
   @Post('/login')
   @ApiOperation({ summary: 'Admin login' })
   @ApiBody({ type: LoginAdminDto })
@@ -27,9 +27,8 @@ export class AdminController {
     return this.adminService.login(dto);
   }
 
-  /** Get all admins (protected) */
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('admin-token')
+  @UseGuards(AdminJwtAuthGuard, AdminGuard)
   @Get('/all')
   @ApiOperation({ summary: 'Get all admins' })
   @ApiResponse({ status: 200, description: 'Returns list of all admins' })
@@ -37,9 +36,8 @@ export class AdminController {
     return this.adminService.findAll();
   }
 
-  /** Get a single admin by ID (protected) */
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('admin-token')
+  @UseGuards(AdminJwtAuthGuard, AdminGuard)
   @Get('/:id')
   @ApiOperation({ summary: 'Get admin by ID' })
   @ApiResponse({ status: 200, description: 'Returns admin details' })
@@ -47,5 +45,3 @@ export class AdminController {
     return this.adminService.findOne(id);
   }
 }
-
-
