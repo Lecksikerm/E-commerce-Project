@@ -19,17 +19,14 @@ export class AdminService {
     private readonly jwtService: JwtService,
   ) { }
 
-  /** Create a new admin with unique email & username */
   async createAdmin(dto: CreateAdminDto): Promise<Partial<Admin>> {
 
-    // Check if email already exists
     const existingEmail = await this.adminRepo.findOne({
       where: { email: dto.email },
     });
     if (existingEmail) {
       throw new ConflictException('Admin with this email already exists');
     }
-
 
     const existingUsername = await this.adminRepo.findOne({
       where: { username: dto.username },
@@ -38,9 +35,7 @@ export class AdminService {
       throw new ConflictException('Admin with this username already exists');
     }
 
-
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-
 
     const admin = this.adminRepo.create({
       ...dto,
@@ -49,7 +44,6 @@ export class AdminService {
 
     const savedAdmin = await this.adminRepo.save(admin);
 
-    // Exclude password before returning
     const { password, ...adminWithoutPassword } = savedAdmin;
     return adminWithoutPassword;
   }
@@ -84,15 +78,21 @@ export class AdminService {
     const { password, ...adminWithoutPassword } = admin;
 
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload, {
+        secret: process.env.JWT_ADMIN_SECRET || 'my-super-admin-secret-key',
+        expiresIn: '1d',
+      }),
       admin: adminWithoutPassword,
     };
   }
 
+
   async findAll(): Promise<Partial<Admin>[]> {
-    const admins = await this.adminRepo.find();
-    return admins.map(({ password, ...adminWithoutPassword }) => adminWithoutPassword);
+    return this.adminRepo.find({
+      select: ['id', 'email', 'name', 'username', 'createdAt', 'updatedAt'],
+    });
   }
+
 
   async findOne(id: string): Promise<Partial<Admin>> {
     const admin = await this.adminRepo.findOne({ where: { id } });
@@ -104,5 +104,6 @@ export class AdminService {
     return adminWithoutPassword;
   }
 }
+
 
 

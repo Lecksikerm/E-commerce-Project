@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsNumber, Min, IsOptional } from 'class-validator';
+import { Product } from 'src/dal/entities';
 
 export class ProductDto {
   @ApiProperty({ example: 'Smart-TV', description: 'Name of the product' })
@@ -26,5 +27,15 @@ export class ProductDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+   constructor(product?: Product) {
+    if (product) {
+      this.name = product.name;
+      this.price = product.price;
+      this.stock = product.stock;
+      this.img = product.img;
+      this.description = product.description;
+    }
+  }
 }
 

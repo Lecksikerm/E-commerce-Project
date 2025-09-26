@@ -8,6 +8,8 @@ import { Repository } from 'typeorm';
 import { Product } from '../dal/entities/product.entity';
 import { ProductDto } from './dto/product.dto';
 import { Admin } from '../dal/entities/admin.entity';
+import { PageOptionsDto } from 'src/auth/dto/page-options.dto';
+import { PageDto } from 'src/auth/dto/page.dto';
 
 @Injectable()
 export class ProductsService {
@@ -15,31 +17,36 @@ export class ProductsService {
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
   ) {}
-
-  /** Get all products (with optional search & sorting) */
   async getAll(
-    searchTerm?: string,
-    sortBy: string = 'createdAt',
-    sortDir: 'ASC' | 'DESC' = 'DESC',
-  ): Promise<Product[]> {
+    userId: string,
+    pageOption: PageOptionsDto,
+  ): Promise<PageDto<ProductDto>> {
+    const { skip, take, searchTerm, sortBy, sortDir } = pageOption;
+
     const query = this.productRepository
       .createQueryBuilder('p')
-      .leftJoinAndSelect('p.createdBy', 'admin')
-      .leftJoinAndSelect('p.category', 'category');
+       .select(['p'])
+      
 
     if (searchTerm) {
-      query.where(
+      query.andWhere(
         'p.name ILIKE :searchTerm OR p.description ILIKE :searchTerm',
         { searchTerm: `%${searchTerm}%` },
       );
     }
 
-    query.orderBy(`p.${sortBy}`, sortDir);
+    query.orderBy(`p.${sortBy}`, sortDir).skip(skip).take(take);
 
-    return query.getMany();
+    const [products, total] = await Promise.all([
+      query.getMany(),
+      query.getCount(),
+    ]);
+
+    const data: ProductDto[] = products.map((product) => new ProductDto(product));
+
+    return new PageDto<ProductDto>(data, total);
   }
 
-  /** Create a new product */
   async create(dto: ProductDto, admin: Admin): Promise<Product> {
     const product = this.productRepository.create({
       ...dto,
@@ -48,7 +55,6 @@ export class ProductsService {
     return this.productRepository.save(product);
   }
 
-  /** Update a product (admin check simplified) */
   async update(
     id: string,
     dto: Partial<ProductDto>,
@@ -63,7 +69,6 @@ export class ProductsService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
-    
     if (product.createdBy && product.createdBy.id !== admin.id) {
       throw new UnauthorizedException('Not allowed to update this product');
     }
@@ -90,17 +95,5 @@ export class ProductsService {
     return { deleted: true };
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
