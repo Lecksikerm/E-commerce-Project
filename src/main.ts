@@ -19,7 +19,6 @@ async function bootstrap() {
   const projectName = 'e-commerce';
   const port = process.env.PORT || 8000;
 
-  // ✅ Global validation pipes
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -28,7 +27,6 @@ async function bootstrap() {
     }),
   );
 
-  // ✅ Swagger configuration with separate user & admin BearerAuth
   const swaggerConfig = new DocumentBuilder()
     .setTitle('E-Commerce API')
     .setDescription('API documentation for the e-commerce project')
@@ -38,7 +36,7 @@ async function bootstrap() {
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
       'user-token',
     )
-    // Admin JWT token
+
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
       'admin-token',

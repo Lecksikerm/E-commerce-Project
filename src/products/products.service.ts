@@ -63,7 +63,7 @@ export class ProductsService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
-    // If createdBy exists, only that admin can update
+    
     if (product.createdBy && product.createdBy.id !== admin.id) {
       throw new UnauthorizedException('Not allowed to update this product');
     }
@@ -72,7 +72,6 @@ export class ProductsService {
     return this.productRepository.save(product);
   }
 
-  /** Delete a product (admin check simplified) */
   async remove(id: string, admin: Admin): Promise<{ deleted: boolean }> {
     const product = await this.productRepository.findOne({
       where: { id },
@@ -83,7 +82,6 @@ export class ProductsService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
-    // If createdBy exists, only that admin can delete
     if (product.createdBy && product.createdBy.id !== admin.id) {
       throw new UnauthorizedException('Not allowed to delete this product');
     }

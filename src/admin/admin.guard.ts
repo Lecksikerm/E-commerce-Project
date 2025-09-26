@@ -5,7 +5,7 @@ import { Admin } from '../dal/entities/admin.entity';
 @Injectable()
 export class AdminGuard extends AuthGuard('admin-jwt') {
   canActivate(context: ExecutionContext) {
-    // Calls the Passport strategy to validate the token
+   
     return super.canActivate(context);
   }
 
@@ -14,7 +14,7 @@ export class AdminGuard extends AuthGuard('admin-jwt') {
     if (err || !user) {
       throw err || new UnauthorizedException('Admin authentication failed');
     }
-    return user; // This will be assigned to req.user in the controller
+    return user; 
   }
 }
 

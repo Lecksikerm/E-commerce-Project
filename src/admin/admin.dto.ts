@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, MinLength, MaxLength, IsString } from 'class-validator';
 
-/** Admin Sign-up DTO */
 export class CreateAdminDto {
   @ApiProperty({ example: 'admin3@gmail.com', description: 'Admin email' })
   @IsEmail()
@@ -33,7 +32,7 @@ export class CreateAdminDto {
   role: string;
 }
 
-/** Admin Login DTO */
+
 export class LoginAdminDto {
   @ApiProperty({ example: 'admin3@gmail.com', description: 'Admin email' })
   @IsEmail()

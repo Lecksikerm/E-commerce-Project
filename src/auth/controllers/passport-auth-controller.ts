@@ -12,7 +12,7 @@ import {
   ApiBody,
   ApiOperation,
   ApiResponse,
-  ApiBearerAuth,  // ✅ Add this
+  ApiBearerAuth, 
 } from '@nestjs/swagger';
 import { AuthService } from '../services/auth.service';
 import { PassportLocalGuard } from '../guards/passport-local-guard';
@@ -39,7 +39,7 @@ export class PassportAuthController {
 
   @Get('/me')
   @UseGuards(PassportJwtAuthGuard)
-  @ApiBearerAuth('access-token') //  This tells Swagger to show the Authorize lock icon
+  @ApiBearerAuth('access-token') 
   @ApiOperation({ summary: 'Get logged-in user info' })
   @ApiResponse({
     status: 200,

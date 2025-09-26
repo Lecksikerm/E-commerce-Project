@@ -10,9 +10,6 @@ import {
   IsOptional,
 } from 'class-validator';
 
-/**
- * Common password validation (reusable)
- */
 export class PasswordDto {
   @ApiProperty({
     example: 'password123',
@@ -25,9 +22,7 @@ export class PasswordDto {
   password: string;
 }
 
-/**
- * Sign-up DTO: email + name + password
- */
+
 export class SignUpDto extends PasswordDto {
   @ApiProperty({
     type: String,
@@ -51,9 +46,6 @@ export class SignUpDto extends PasswordDto {
   name: string;
 }
 
-/**
- * Login DTO: usernameOrEmail + password
- */
 export class LoginDto extends PasswordDto {
   @ApiProperty({
     example: 'ademola',
@@ -63,7 +55,7 @@ export class LoginDto extends PasswordDto {
   @IsNotEmpty({ message: 'Username or Email is required' })
   usernameOrEmail: string;
 
-  
+
   @ApiProperty({
     example: 'password123',
     description: 'Password must be 6-64 characters long',
@@ -76,9 +68,6 @@ export class LoginDto extends PasswordDto {
 
 }
 
-/**
- * Admin Sign-up DTO: email + name + password + role
- */
 
 export class AdminSignUpDto {
   @ApiProperty({ example: 'admin3@gmail.com', description: 'Admin email' })
@@ -126,7 +115,7 @@ export class CreateProductDto {
   stock: number;
 }
 
-  export class UpdateProductDto {
+export class UpdateProductDto {
   @ApiPropertyOptional({ example: 'External SSD', description: 'Product name' })
   @IsOptional()
   @IsString()

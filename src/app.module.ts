@@ -6,7 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import { User } from './dal/entities/user.entity';
-import { Admin } from './dal/entities/admin.entity'; //  Make sure you have this entity
+import { Admin } from './dal/entities/admin.entity'; 
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
@@ -16,7 +16,7 @@ import { Category } from './dal/entities/category.entity';
 
 @Module({
   imports: [
-    //  Load .env configuration globally
+    
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -31,12 +31,11 @@ import { Category } from './dal/entities/category.entity';
         password: process.env.DB_PASS || 'postgres',
         database: process.env.DB_NAME || 'e-commerce',
         entities: [User, Admin, Product, Category],
-        synchronize: true, //  use only for development, disable in production
+        synchronize: true, 
         logging: true,
       }),
     }),
 
-    // ✅ Import feature modules
     UsersModule,
     AuthModule,
     AdminModule,

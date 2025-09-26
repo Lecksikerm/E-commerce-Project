@@ -5,7 +5,7 @@ import { ProductsService } from './products.service';
 import { Product } from '../dal/entities/product.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product])], //  Register Product repository
+  imports: [TypeOrmModule.forFeature([Product])], 
   controllers: [ProductsController],
   providers: [ProductsService],
   exports: [ProductsService],

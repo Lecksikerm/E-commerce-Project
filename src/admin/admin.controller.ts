@@ -10,7 +10,6 @@ import { AdminGuard } from './admin.guard';
 export class AdminController {
   constructor(private readonly adminService: AdminService) { }
 
-  // ✅ Public endpoint (no guard)
   @Post('/register')
   @ApiOperation({ summary: 'Register a new admin' })
   @ApiBody({ type: CreateAdminDto })

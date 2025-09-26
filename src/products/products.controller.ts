@@ -24,7 +24,6 @@ import { AdminJwtAuthGuard } from 'src/auth/guards/admin-jwt.guard';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  /** Get all products */
   @Get('/')
   @ApiOperation({ summary: 'Get all products' })
   @ApiResponse({ status: 200, description: 'List of all products', type: [Product] })
@@ -32,7 +31,6 @@ export class ProductsController {
     return this.productsService.getAll();
   }
 
-  /** Create a new product (Admin only) */
   @UseGuards(AdminJwtAuthGuard)
   @Post('/')
   @ApiBearerAuth('admin-token')
@@ -40,11 +38,10 @@ export class ProductsController {
   @ApiBody({ type: ProductDto })
   @ApiResponse({ status: 201, description: 'Product created successfully', type: Product })
   async create(@Body() dto: ProductDto, @Req() req: any) {
-    const admin: Admin = req.user; // injected by JwtStrategy
+    const admin: Admin = req.user; 
     return this.productsService.create(dto, admin);
   }
 
-  /** Update a product (Admin only) */
   @UseGuards(AdminJwtAuthGuard)
   @Patch(':id')
   @ApiBearerAuth('admin-token')
@@ -64,7 +61,7 @@ export class ProductsController {
     return this.productsService.update(id, dto, admin);
   }
 
-  /** Delete a product (Admin only) */
+
   @UseGuards(AdminJwtAuthGuard)
   @Delete(':id')
   @ApiBearerAuth('admin-token')
