@@ -6,15 +6,26 @@ import { AuthService } from '../services/auth.service';
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
-    super({ usernameField: 'usernameOrEmail', passwordField: 'password' }); 
+     super({
+      usernameField: 'usernameOrEmail', //  Accepts username OR email
+      passwordField: 'password',
+    });
   }
 
-  async validate(username: string, password: string) {
-    const user = await this.authService.validateUser({ usernameOrEmail: username, password });
-    if (!user) throw new UnauthorizedException('Invalid credentials');
-    return user;
+  async validate(usernameOrEmail: string, password: string) {
+    const user = await this.authService.validateUser({
+      usernameOrEmail,
+      password,
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    return user; // Passport attaches this user to req.user
   }
 }
+
 
 
 

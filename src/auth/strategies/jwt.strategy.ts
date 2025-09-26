@@ -6,22 +6,24 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false, //  Ensures expired tokens are rejected
-      secretOrKey: process.env.JWT_SECRET || 'my-super-secret-key', // MUST match JwtModule secret
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // pass function
+      ignoreExpiration: false, // reject expired tokens
+      secretOrKey: process.env.JWT_SECRET || 'my-super-secret-key', // must match JwtModule secret
     });
   }
 
   async validate(payload: any) {
     console.log('JWT payload validated:', payload);
     return {
-      id: payload.sub,
+      userId: payload.sub, // match what AuthService sets
       email: payload.email,
       role: payload.role,
       username: payload.username,
     };
   }
 }
+
+
 
 
 

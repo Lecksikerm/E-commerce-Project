@@ -1,21 +1,50 @@
-import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, MinLength, MaxLength, IsString } from 'class-validator';
 
 export class CreateAdminDto {
-  @IsNotEmpty()
-    name!: string;
-
+  @ApiProperty({ example: 'admin3@gmail.com', description: 'Admin email' })
   @IsEmail()
-    email!: string;
-
   @IsNotEmpty()
-    @MinLength(6)
-    password!: string;
+  email: string;
+
+  @ApiProperty({ example: 'Admin Three', description: 'Full name of the admin' })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(60)
+  name: string;
+
+  @ApiProperty({ example: 'admin3', description: 'Username of the admin' })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(30)
+  username: string;
+
+  @ApiProperty({ example: '1234560', description: 'Password 6-64 chars' })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(6)
+  @MaxLength(64)
+  password: string;
+
+  @ApiProperty({ example: 'admin', description: 'Role of the user' })
+  @IsString()
+  @IsNotEmpty()
+  role: string;
 }
+
 
 export class LoginAdminDto {
+  @ApiProperty({ example: 'admin3@gmail.com', description: 'Admin email' })
   @IsEmail()
-    email!: string;
-
   @IsNotEmpty()
-    password!: string;
+  email: string;
+
+  @ApiProperty({ example: '1234560', description: 'Password 6-64 chars' })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(6)
+  @MaxLength(64)
+  password: string;
 }
+
+

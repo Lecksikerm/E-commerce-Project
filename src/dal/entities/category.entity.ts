@@ -5,11 +5,11 @@ import { Product } from './product.entity';
 @Entity('categories')
 export class Category extends Base {
   @Column({ type: 'varchar', length: 100, unique: true })
-  name!: string;
+  name: string;
 
   @Column({ type: 'text', nullable: true })
-  description?: string;
+  description: string;
 
   @OneToMany(() => Product, (product) => product.category)
-  products!: Product[];
+  products: Product[];
 }

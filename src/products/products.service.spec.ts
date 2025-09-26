@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsService } from './products.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Product } from '../entities/product.entity';
+import { Product } from '../dal/entities/product.entity';
 import { Repository } from 'typeorm';
+import { SORT_ORDER } from 'src/auth/dto/page-options.dto';
 
 describe('ProductsService', () => {
   let service: ProductsService;
@@ -34,7 +35,10 @@ describe('ProductsService', () => {
 
   it('should call repository find method', async () => {
     repo.find = jest.fn().mockResolvedValue([]);
-    const result = await service.findAll();
+    const result = await service.getAll('', {
+      sortBy: 'createdAt',
+      sortDir: SORT_ORDER.DESC,
+    } as any);
     expect(result).toEqual([]);
     expect(repo.find).toHaveBeenCalled();
   });
