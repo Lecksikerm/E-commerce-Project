@@ -28,7 +28,7 @@ export class ProductDto {
   @IsOptional()
   description?: string;
 
-  
+
   @ApiProperty({ example: 'uuid-of-category', description: 'Optional category ID', required: false })
   @IsUUID()
   @IsOptional()
@@ -36,19 +36,19 @@ export class ProductDto {
   category: Category;
   createdAt: Date;
   updatedAt: Date;
+  id: string;
 
   constructor(product?: Product) {
     if (product) {
+      this.id = product.id;
       this.name = product.name;
-      this.price = product.price;
+      this.price = Number(product.price);
       this.stock = product.stock;
       this.img = product.img;
       this.description = product.description;
       this.categoryId = product.category?.id;
-       this.category = product.category; 
-    this.createdAt = product.createdAt;
-    this.updatedAt = product.updatedAt;
+
     }
   }
-}
 
+}
