@@ -24,7 +24,7 @@ export class ProductsService {
     const { skip, take, searchTerm, sortBy, sortDir } = pageOption;
 
     const query = this.productRepository
-      .createQueryBuilder('p')
+      .createpageOptions: PageOptionsDto, pageOptions: PageOptionsDto
        .select(['p'])
       
 
