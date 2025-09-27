@@ -31,7 +31,7 @@ async function bootstrap() {
     .setTitle('E-Commerce API')
     .setDescription('API documentation for the e-commerce project')
     .setVersion('1.0')
-    // User JWT token
+    
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
       'user-token',

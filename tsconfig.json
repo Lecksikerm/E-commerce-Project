@@ -26,6 +26,6 @@
   "exclude": [
     "node_modules",
     "dist",
-    "scripts/**/*" //  explicitly exclude scripts folder
+    "src/scripts/**/*" //  explicitly exclude scripts folder
   ]
 }
