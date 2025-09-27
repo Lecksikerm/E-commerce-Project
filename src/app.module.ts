@@ -13,6 +13,7 @@ import { AdminModule } from './admin/admin.module';
 import { ProductsModule } from './products/products.module';
 import { Product } from './dal/entities/product.entity';
 import { Category } from './dal/entities/category.entity';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { Category } from './dal/entities/category.entity';
     AuthModule,
     AdminModule,
     ProductsModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

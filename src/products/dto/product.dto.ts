@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsNumber, Min, IsOptional } from 'class-validator';
-import { Product } from 'src/dal/entities';
+import { IsNotEmpty, IsString, IsNumber, Min, IsOptional, IsUUID } from 'class-validator';
+import { Category, Product } from 'src/dal/entities';
 
 export class ProductDto {
-  @ApiProperty({ example: 'Smart-TV', description: 'Name of the product' })
+  @ApiProperty({ example: 'Power Bank', description: 'Name of the product' })
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -28,13 +28,26 @@ export class ProductDto {
   @IsOptional()
   description?: string;
 
-   constructor(product?: Product) {
+  
+  @ApiProperty({ example: 'uuid-of-category', description: 'Optional category ID', required: false })
+  @IsUUID()
+  @IsOptional()
+  categoryId?: string;
+  category: Category;
+  createdAt: Date;
+  updatedAt: Date;
+
+  constructor(product?: Product) {
     if (product) {
       this.name = product.name;
       this.price = product.price;
       this.stock = product.stock;
       this.img = product.img;
       this.description = product.description;
+      this.categoryId = product.category?.id;
+       this.category = product.category; 
+    this.createdAt = product.createdAt;
+    this.updatedAt = product.updatedAt;
     }
   }
 }

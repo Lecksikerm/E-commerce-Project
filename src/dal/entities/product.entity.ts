@@ -20,16 +20,16 @@ export class Product extends Base {
   @Column({ type: 'text', nullable: true })
   description: string | null;
 
-  // Category relation
+
   @ManyToOne(() => Category, { nullable: true, eager: true })
   @JoinColumn({ name: 'categoryId' })
   category: Category;
 
   @Column({ type: 'uuid', nullable: true })
-  categoryId: string | null; // Optional explicit column if needed
+  categoryId?: string;
 
-  // Admin relation
-  @ManyToOne(() => Admin, admin => admin.products, { eager: true })
+
+  @ManyToOne(() => Admin, admin => admin.products, { eager: false })
   @JoinColumn({ name: 'createdById' })
   createdBy: Admin;
 }
