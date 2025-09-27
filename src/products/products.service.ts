@@ -13,6 +13,9 @@ import { PageOptionsDto } from 'src/auth/dto/page-options.dto';
 import { PageDto } from 'src/auth/dto/page.dto';
 
 @Injectable()
+  getOne(id: string, user: Admin) {
+    throw new Error('Method not implemented.');
+  }
 export class ProductsService {
   constructor(
     @InjectRepository(Product)

@@ -7,7 +7,7 @@ import { AdminJwtAuthGuard } from 'src/auth/guards/admin-jwt.guard';
 @ApiTags('Categories')
 @Controller('categories')
 export class CategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(private readonly categoriesService: CategoriesService) { }
 
   @Get('/')
   @ApiOperation({ summary: 'Get all categories' })
@@ -34,11 +34,5 @@ export class CategoriesController {
     return this.categoriesService.update(id, dto);
   }
 
-  @UseGuards(AdminJwtAuthGuard)
-  @ApiBearerAuth('admin-token')
-  @Delete('/:id')
-  @ApiOperation({ summary: 'Delete a category (Admin only)' })
-  remove(@Param('id') id: string) {
-    return this.categoriesService.remove(id);
-  }
+
 }
