@@ -7,7 +7,7 @@ export class AddDescriptionToProducts1695567890123 implements MigrationInterface
             new TableColumn({
                 name: "description",
                 type: "text",
-                isNullable: true, // Optional field
+                isNullable: true,
             })
         );
     }
