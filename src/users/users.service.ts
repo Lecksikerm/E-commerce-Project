@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../dal/entities/user.entity';
 
-// ✅ Declare type OUTSIDE the class
 export type SafeUser = Omit<User, 'password'>;
 
 @Injectable()
@@ -28,7 +27,7 @@ export class UsersService {
     const user = await this.userRepo.findOne({ where: { id } });
     if (!user) throw new NotFoundException(`User with id ${id} not found`);
 
-    // ✅ Remove password before returning
+    
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword as SafeUser;
   }

@@ -14,6 +14,9 @@ import { ProductsModule } from './products/products.module';
 import { Product } from './dal/entities/product.entity';
 import { Category } from './dal/entities/category.entity';
 import { CategoriesModule } from './categories/categories.module';
+import { Cart } from './dal/entities/cart.entity';
+import { CartItem } from './dal/entities/cart-item.entity';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -31,7 +34,7 @@ import { CategoriesModule } from './categories/categories.module';
         username: process.env.DB_USER || 'postgres',
         password: process.env.DB_PASS || 'postgres',
         database: process.env.DB_NAME || 'e-commerce',
-        entities: [User, Admin, Product, Category],
+        entities: [User, Admin, Product, Category, Cart, CartItem],
         synchronize: true, 
         logging: true,
       }),
@@ -42,6 +45,7 @@ import { CategoriesModule } from './categories/categories.module';
     AdminModule,
     ProductsModule,
     CategoriesModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService],

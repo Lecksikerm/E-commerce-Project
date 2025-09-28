@@ -10,14 +10,14 @@ import { JwtService } from '@nestjs/jwt';
 
 export type AuthInput = { usernameOrEmail: string; password: string };
 export type SigninData = {
-  userId: number;
+  userId: string; // <-- changed to string because Base.id is UUID
   username: string;
   email: string;
   role: string;
 };
 export type AuthResult = {
   accessToken: string;
-  userId: number;
+  userId: string;
   username: string;
   email: string;
   role: string;
@@ -52,7 +52,7 @@ export class AuthService {
     if (!isPasswordValid) return null;
 
     return {
-      userId: user.userId,
+      userId: user.id, // ✅ use `id` from Base entity
       username: user.username,
       email: user.email,
       role: user.role || 'user',
@@ -80,7 +80,7 @@ export class AuthService {
     return {
       message: 'User signed up successfully',
       user: {
-        userId: newUser.userId,
+        userId: newUser.id, // ✅ use id here too
         email: newUser.email,
         name: newUser.name,
         username: newUser.username,
@@ -92,7 +92,7 @@ export class AuthService {
   /** Sign a JWT and return token + user info */
   async signIn(user: SigninData): Promise<AuthResult> {
     const payload = {
-      sub: user.userId, // correct field
+      sub: user.userId,
       username: user.username,
       email: user.email,
       role: user.role,
@@ -109,6 +109,7 @@ export class AuthService {
     };
   }
 }
+
 
 
 

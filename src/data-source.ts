@@ -4,6 +4,8 @@ import { Product } from "./dal/entities/product.entity"; // adjust path
 import { Category } from "./dal/entities/category.entity"; // adjust path
 import { User } from "./dal/entities/user.entity";
 import { Admin } from "./dal/entities/admin.entity";
+import { Cart } from "./dal/entities/cart.entity";
+import { CartItem } from "./dal/entities/cart-item.entity";
 
 export const dataSource = new DataSource({
     type: "postgres",
@@ -14,7 +16,7 @@ export const dataSource = new DataSource({
     database: "e-commerce",
     synchronize: false, // migrations handle schema
     logging: true,
-    entities: [Product, Category, Admin, User], // add all your entities here
+    entities: [Product, Category, Admin, User, Cart, CartItem], 
     migrations: ["src/migrations/*.ts"],
     subscribers: [],
 });
