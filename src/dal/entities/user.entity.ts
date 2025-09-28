@@ -1,12 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { Base } from './base.entity';
 import { Product } from './product.entity';
+import { Cart } from './cart.entity';
 
 @Entity({ name: 'users' })
 export class User extends Base {
-  @PrimaryGeneratedColumn('uuid') // Primary key
-  id: string;
-
   @Column({ type: 'varchar', unique: true })
   email: string;
 
@@ -24,8 +22,11 @@ export class User extends Base {
 
   @OneToMany(() => Product, (product) => product.createdBy)
   products: Product[];
-  userId: any;
+
+  @OneToMany(() => Cart, (cart) => cart.user)
+  carts: Cart[];
 }
+
 
 
 

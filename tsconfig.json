@@ -2,9 +2,15 @@
   "compilerOptions": {
     "target": "ES2021",
     "module": "commonjs",
-    "lib": ["ES2021"],
+    "lib": [
+      "ES2021"
+    ],
     "outDir": "./dist",
-    "rootDir": "./src", // ✅ only compile files inside src
+    "rootDir": "./src",
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ],
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": false,
@@ -14,18 +20,24 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "paths": {
-      "src/*": ["./src/*"]
+      "src/*": [
+        "./src/*"
+      ]
     },
-    "types": ["node", "jest", "passport-local"],
+    "types": [
+      "node",
+      "jest",
+      "passport-local"
+    ],
     "sourceMap": true,
     "skipLibCheck": true
   },
   "include": [
-    "src/**/*" //  removed scripts/ensure-admin.ts to stop compilation error
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "src/scripts/**/*" //  explicitly exclude scripts folder
+    "src/scripts/**/*" 
   ]
 }
