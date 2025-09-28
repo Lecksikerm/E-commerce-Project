@@ -20,7 +20,7 @@ import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
 @ApiTags('Auth')
 @Controller('v1/auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   /** Register a new user */
   @Post('/signup')
