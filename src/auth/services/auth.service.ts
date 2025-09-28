@@ -10,7 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 
 export type AuthInput = { usernameOrEmail: string; password: string };
 export type SigninData = {
-  userId: string; // <-- changed to string because Base.id is UUID
+  userId: string; 
   username: string;
   email: string;
   role: string;
@@ -31,14 +31,14 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  /** Login flow */
+  
   async authenticate(input: AuthInput): Promise<AuthResult> {
     const user = await this.validateUser(input);
     if (!user) throw new UnauthorizedException('Invalid credentials');
     return this.signIn(user);
   }
 
-  /** Validate user credentials */
+  
   async validateUser(input: AuthInput): Promise<SigninData | null> {
     const user = await this.usersService.findUserByUsernameOrEmail(
       input.usernameOrEmail,
@@ -52,14 +52,14 @@ export class AuthService {
     if (!isPasswordValid) return null;
 
     return {
-      userId: user.id, // ✅ use `id` from Base entity
+      userId: user.id, 
       username: user.username,
       email: user.email,
       role: user.role || 'user',
     };
   }
 
-  /** Register new user */
+ 
   async register(signUpDto: SignUpDto) {
     const { email, name, password } = signUpDto;
     const username = email.split('@')[0];
@@ -80,7 +80,7 @@ export class AuthService {
     return {
       message: 'User signed up successfully',
       user: {
-        userId: newUser.id, // ✅ use id here too
+        userId: newUser.id, 
         email: newUser.email,
         name: newUser.name,
         username: newUser.username,
@@ -89,7 +89,7 @@ export class AuthService {
     };
   }
 
-  /** Sign a JWT and return token + user info */
+  
   async signIn(user: SigninData): Promise<AuthResult> {
     const payload = {
       sub: user.userId,
