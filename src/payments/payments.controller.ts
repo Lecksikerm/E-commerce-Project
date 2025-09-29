@@ -68,20 +68,19 @@ export class PaymentsController {
         return this.paymentsService.handleWebhook(signature, payload);
     }
 
-   @Get('/callback')
-@ApiOperation({ summary: 'Paystack callback URL (user is redirected here after payment)' })
-async paymentCallback(
-  @Query('reference') reference: string,
-  @Res() res: Response,
-) {
-  const result = await this.paymentsService.handleCallback(reference);
+    @Get('/callback')
+    @ApiOperation({ summary: 'Paystack callback URL (user is redirected here after payment)' })
+    async paymentCallback(
+        @Query('reference') reference: string,
+        @Res() res: Response,
+    ) {
+        const result = await this.paymentsService.handleCallback(reference);
 
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8000';
-  return res.redirect(
-    `${frontendUrl}/payment-status?status=${result.status}&reference=${result.reference}`,
-  );
-
- }
+        return res.json({
+            status: result.status,
+            reference: result.reference,
+        });
+    }
 
     @ApiOkResponse({ type: TransactionTotalsDto })
     @Get('/totals')
@@ -102,6 +101,6 @@ async paymentCallback(
         @Query('perPage') perPage?: number,
     ) {
         return this.paymentsService.fetchTransactions(page, perPage);
-    
-}
+
+    }
 }
