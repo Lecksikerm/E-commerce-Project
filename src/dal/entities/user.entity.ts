@@ -25,6 +25,7 @@ export class User extends Base {
 
   @OneToMany(() => Cart, (cart) => cart.user)
   carts: Cart[];
+    transactions: any;
 }
 
 
