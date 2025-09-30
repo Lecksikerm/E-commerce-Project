@@ -19,8 +19,6 @@ export class PaymentsService {
         private readonly configService: ConfigService,
     ) {
 
-        console.log('PAYSTACK_BASE_URL:', this.configService.get('PAYSTACK_BASE_URL'));
-        console.log('BACKEND_URL:', this.configService.get('BACKEND_URL'));
     }
 
     private get paystackBaseUrl(): string {
@@ -134,51 +132,35 @@ export class PaymentsService {
         }
     }
 
-    async handleWebhook(signature: string, payload: PaystackWebhookDto) {
-        const hash = crypto
-            .createHmac('sha512', this.paystackSecretKey)
-            .update(JSON.stringify(payload))
-            .digest('hex');
+    async handleWebhook(signature: string, rawBody: string) {
+  const hash = crypto
+    .createHmac('sha512', this.paystackSecretKey)
+    .update(rawBody) 
+    .digest('hex');
 
-        if (hash !== signature) {
-            this.logger.warn('Invalid Paystack webhook signature received');
-            return { received: false };
-        }
+  if (hash !== signature) {
+    this.logger.warn(' Invalid Paystack signature');
+    return { received: false };
+  }
 
-        this.logger.debug(`Received webhook event: ${payload.event}`);
+  const payload = JSON.parse(rawBody); 
+  this.logger.log(`Verified event: ${payload.event}`);
 
-        if (payload.event === 'charge.success') {
-            const reference = payload.data.reference;
-            const transaction = await this.paymentsRepo.findOne({ where: { reference } });
+  if (payload.event === 'charge.success') {
+    const reference = payload.data.reference;
+    const transaction = await this.paymentsRepo.findOne({ where: { reference } });
 
-            if (transaction) {
-                transaction.status = payload.data.status;
-                await this.paymentsRepo.save(transaction);
-                this.logger.log(`Transaction ${reference} marked as ${payload.data.status}`);
-            } else {
-                this.logger.warn(`Transaction with reference ${reference} not found`);
-            }
-        }
-
-        return { received: true };
+    if (transaction) {
+      transaction.status = payload.data.status;
+      await this.paymentsRepo.save(transaction);
+      this.logger.log(`Transaction ${reference} updated to success`);
+    } else {
+      this.logger.warn(`Transaction ${reference} not found`);
     }
+  }
 
-    async handleCallback(reference: string) {
-        try {
-            const transaction = await this.verifyPayment(reference);
-
-            return {
-                status: transaction.status,
-                reference: transaction.reference,
-            };
-        } catch (error) {
-            return {
-                status: 'failed',
-                reference,
-            };
-        }
-    }
-
+  return { received: true };
+}
 
     async getTransactionTotals() {
         try {

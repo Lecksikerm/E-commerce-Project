@@ -19,6 +19,7 @@ import {
     ApiResponse,
     ApiOkResponse,
     ApiQuery,
+    ApiBody,
 } from '@nestjs/swagger';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -55,32 +56,16 @@ export class PaymentsController {
     async verifyPayment(@Param('reference') reference: string) {
         return this.paymentsService.verifyPayment(reference);
     }
-
     @Post('/webhook')
     @HttpCode(200)
-    @ApiOperation({ summary: 'Paystack webhook endpoint (for payment status updates)' })
-    @ApiResponse({ status: 200, description: 'Acknowledges receipt of webhook' })
     async handleWebhook(
         @Headers('x-paystack-signature') signature: string,
-        @Body() payload: PaystackWebhookDto,
+        @Req() req: any, 
     ) {
-        console.log(payload);
-        return this.paymentsService.handleWebhook(signature, payload);
+        return this.paymentsService.handleWebhook(signature, req.rawBody);
     }
 
-    @Get('/callback')
-    @ApiOperation({ summary: 'Paystack callback URL (user is redirected here after payment)' })
-    async paymentCallback(
-        @Query('reference') reference: string,
-        @Res() res: Response,
-    ) {
-        const result = await this.paymentsService.handleCallback(reference);
 
-        return res.json({
-            status: result.status,
-            reference: result.reference,
-        });
-    }
 
     @ApiOkResponse({ type: TransactionTotalsDto })
     @Get('/totals')
