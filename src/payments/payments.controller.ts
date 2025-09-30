@@ -70,7 +70,7 @@ export class PaymentsController {
         @Headers('x-paystack-signature') signature: string,
         @Req() req: any,
     ) {
-        return this.paymentsService.handleWebhook(signature, req.rawBody);
+        return this.paystackService.handleWebhook(signature, req.rawBody);
     }
 
 
