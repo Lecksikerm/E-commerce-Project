@@ -21,7 +21,7 @@ import {
     ApiQuery,
     ApiBody,
 } from '@nestjs/swagger';
-import { PaymentsService } from './payments.service';
+import { PaymentsService } from './services/payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentResponseDto } from './dto/payment-response.dto';
 import { PaystackWebhookDto } from './dto/paystack.dto';
@@ -32,12 +32,15 @@ import { PaystackTransactionDto } from './dto/paystack-transactions.dto';
 import { ConfigService } from '@nestjs/config';
 import { AdminGuard } from 'src/admin/admin.guard';
 import { PageOptionsDto } from 'src/auth/dto/page-options.dto';
+import { PaystackService } from './services/paystack.service';
 
 @ApiTags('Payments')
 @Controller('payments')
 export class PaymentsController {
+    
     constructor(
         private readonly paymentsService: PaymentsService,
+         private readonly paystackService: PaystackService,
         private readonly configService: ConfigService,
     ) { }
 
@@ -47,16 +50,15 @@ export class PaymentsController {
     @ApiOperation({ summary: 'Initialize a payment' })
     @ApiResponse({ status: 201, type: PaymentResponseDto })
     async initializePayment(@Req() request: Request, @Body() dto: CreatePaymentDto) {
-        console.log('PAYSTACK_BASE_URL:', this.configService.get('PAYSTACK_BASE_URL'));
-        console.log('BACKEND_URL:', this.configService.get('BACKEND_URL'));
-
-        return this.paymentsService.initializePayment((request as any).user.id, dto);
+        const userId = (request as any).user.id;
+        return this.paystackService.initializePayment(userId, dto);
     }
 
     @Post('verify/:reference')
     @ApiOperation({ summary: 'Verify a payment by reference' })
+    @ApiResponse({ status: 200, type: PaymentResponseDto })
     async verifyPayment(@Param('reference') reference: string) {
-        return this.paymentsService.verifyPayment(reference);
+        return this.paystackService.verifyPayment(reference);
     }
 
     @Post('/webhook')
@@ -91,3 +93,7 @@ export class PaymentsController {
     }
 
 }
+    function verifyPayment(arg0: any, reference: any, string: any) {
+        throw new Error('Function not implemented.');
+    }
+

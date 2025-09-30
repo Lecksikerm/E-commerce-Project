@@ -5,9 +5,9 @@ import axios from 'axios';
 import * as crypto from 'crypto';
 import { ConfigService } from '@nestjs/config';
 
-import { PaymentTransaction } from '../dal/entities/payment-transaction.entity';
-import { CreatePaymentDto } from './dto/create-payment.dto';
-import { PaystackInitResponseDto, PaystackWebhookDto } from './dto/paystack.dto';
+import { PaymentTransaction } from '../../dal/entities/payment-transaction.entity';
+import { CreatePaymentDto } from '../dto/create-payment.dto';
+import { PaystackInitResponseDto, PaystackWebhookDto } from '../dto/paystack.dto';
 import { PageOptionsDto } from 'src/auth/dto/page-options.dto';
 
 @Injectable()
@@ -192,18 +192,18 @@ export class PaymentsService {
     }
 
     async fetchTransactions(pageOptions: PageOptionsDto) {
-  const { page, take } = pageOptions;
+        const { page, take } = pageOptions;
 
-  const response = await axios.get(`${this.paystackBaseUrl}/transaction`, {
-    headers: { Authorization: `Bearer ${this.paystackSecretKey}` },
-    params: {
-      page,
-      perPage: take
-    },
-  });
+        const response = await axios.get(`${this.paystackBaseUrl}/transaction`, {
+            headers: { Authorization: `Bearer ${this.paystackSecretKey}` },
+            params: {
+                page,
+                perPage: take
+            },
+        });
 
-  return response.data;
-}
+        return response.data;
+    }
 
 }
 
