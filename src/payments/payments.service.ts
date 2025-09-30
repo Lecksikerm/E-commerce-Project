@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { PaymentTransaction } from '../dal/entities/payment-transaction.entity';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaystackInitResponseDto, PaystackWebhookDto } from './dto/paystack.dto';
+import { PageOptionsDto } from 'src/auth/dto/page-options.dto';
 
 @Injectable()
 export class PaymentsService {
@@ -133,40 +134,46 @@ export class PaymentsService {
     }
 
     async handleWebhook(signature: string, rawBody: string) {
-  const hash = crypto
-    .createHmac('sha512', this.paystackSecretKey)
-    .update(rawBody) 
-    .digest('hex');
+        const hash = crypto
+            .createHmac('sha512', this.paystackSecretKey)
+            .update(rawBody)
+            .digest('hex');
 
-  if (hash !== signature) {
-    this.logger.warn(' Invalid Paystack signature');
-    return { received: false };
-  }
+        if (hash !== signature) {
+            this.logger.warn(' Invalid Paystack signature');
+            return { received: false };
+        }
 
-  const payload = JSON.parse(rawBody); 
-  this.logger.log(`Verified event: ${payload.event}`);
+        const payload = JSON.parse(rawBody);
+        this.logger.log(`Verified event: ${payload.event}`);
 
-  if (payload.event === 'charge.success') {
-    const reference = payload.data.reference;
-    const transaction = await this.paymentsRepo.findOne({ where: { reference } });
+        if (payload.event === 'charge.success') {
+            const reference = payload.data.reference;
+            const transaction = await this.paymentsRepo.findOne({ where: { reference } });
 
-    if (transaction) {
-      transaction.status = payload.data.status;
-      await this.paymentsRepo.save(transaction);
-      this.logger.log(`Transaction ${reference} updated to success`);
-    } else {
-      this.logger.warn(`Transaction ${reference} not found`);
+            if (transaction) {
+                transaction.status = payload.data.status;
+                await this.paymentsRepo.save(transaction);
+                this.logger.log(`Transaction ${reference} updated to success`);
+            } else {
+                this.logger.warn(`Transaction ${reference} not found`);
+            }
+        }
+
+        return { received: true };
     }
-  }
-
-  return { received: true };
-}
 
     async getTransactionTotals() {
         try {
-            const response = await axios.get(`${this.paystackBaseUrl}/transaction/totals`, {
-                headers: { Authorization: `Bearer ${this.paystackSecretKey}` },
-            });
+            const response = await axios.get(
+                `${this.paystackBaseUrl}/transaction/totals`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${this.paystackSecretKey}`,
+                        'Content-Type': 'application/json',
+                    },
+                },
+            );
 
             if (!response.data.status) {
                 throw new BadRequestException('Failed to fetch transaction totals');
@@ -174,28 +181,30 @@ export class PaymentsService {
 
             return response.data;
         } catch (error) {
-            this.logger.error('Error fetching transaction totals', (error as Error).message);
+            this.logger.error(
+                'Error fetching transaction totals',
+                (error as Error).message,
+            );
             throw new BadRequestException('Unable to fetch transaction totals');
         }
+
+
     }
 
-    async fetchTransactions(page = 1, perPage = 50) {
-        try {
-            const response = await axios.get(`${this.paystackBaseUrl}/transaction`, {
-                headers: { Authorization: `Bearer ${this.paystackSecretKey}` },
-                params: { page, perPage },
-            });
+    async fetchTransactions(pageOptions: PageOptionsDto) {
+  const { page, take } = pageOptions;
 
-            if (!response.data.status) {
-                throw new BadRequestException('Failed to fetch transactions');
-            }
+  const response = await axios.get(`${this.paystackBaseUrl}/transaction`, {
+    headers: { Authorization: `Bearer ${this.paystackSecretKey}` },
+    params: {
+      page,
+      perPage: take
+    },
+  });
 
-            return response.data;
-        } catch (error) {
-            this.logger.error('Error fetching transactions', (error as Error).message);
-            throw new BadRequestException('Unable to fetch transactions');
-        }
-    }
+  return response.data;
+}
+
 }
 
 

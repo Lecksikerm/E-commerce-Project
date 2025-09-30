@@ -30,6 +30,8 @@ import { Request, Response } from 'express';
 import { TransactionTotalsDto } from './dto/transaction-totals.dto';
 import { PaystackTransactionDto } from './dto/paystack-transactions.dto';
 import { ConfigService } from '@nestjs/config';
+import { AdminGuard } from 'src/admin/admin.guard';
+import { PageOptionsDto } from 'src/auth/dto/page-options.dto';
 
 @ApiTags('Payments')
 @Controller('payments')
@@ -56,36 +58,36 @@ export class PaymentsController {
     async verifyPayment(@Param('reference') reference: string) {
         return this.paymentsService.verifyPayment(reference);
     }
+
     @Post('/webhook')
     @HttpCode(200)
+    @ApiOperation({ summary: 'Paystack Webhook Handler' })
+    @ApiBody({ type: PaystackWebhookDto })
+    @ApiResponse({ status: 200, description: 'Webhook processed successfully' })
     async handleWebhook(
         @Headers('x-paystack-signature') signature: string,
-        @Req() req: any, 
+        @Req() req: any,
     ) {
         return this.paymentsService.handleWebhook(signature, req.rawBody);
     }
 
 
-
     @ApiOkResponse({ type: TransactionTotalsDto })
     @Get('/totals')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AdminGuard)
     @ApiBearerAuth('admin-token')
     async getTransactionTotals() {
         return this.paymentsService.getTransactionTotals();
     }
 
     @ApiOkResponse({ type: [PaystackTransactionDto] })
-    @Get('transactions')
-    @UseGuards(JwtAuthGuard)
+    @Get('/transactions')
+    @UseGuards(AdminGuard)
     @ApiBearerAuth('admin-token')
-    @ApiQuery({ name: 'page', required: false, example: 1 })
-    @ApiQuery({ name: 'perPage', required: false, example: 50 })
     async fetchTransactions(
-        @Query('page') page?: number,
-        @Query('perPage') perPage?: number,
+        @Query(new ValidationPipe({ transform: true })) pageOptions: PageOptionsDto,
     ) {
-        return this.paymentsService.fetchTransactions(page, perPage);
-
+        return this.paymentsService.fetchTransactions(pageOptions);
     }
+
 }
