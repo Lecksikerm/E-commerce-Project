@@ -12,7 +12,6 @@ export class CreatePaymentDto {
 
   
   @ApiProperty({ example: 'f1d2d2f9-3b9b-4d0d-bc4b-53d6c3d9f4b7', required: false })
-  @IsOptional()
   @IsUUID()
   productId?: string;
 

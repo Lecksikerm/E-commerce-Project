@@ -32,6 +32,8 @@ export class Product extends Base {
   @ManyToOne(() => Admin, admin => admin.products, { eager: false })
   @JoinColumn({ name: 'createdById' })
   createdBy: Admin;
+  amount: number;
+    transactions: any;
 }
 
 

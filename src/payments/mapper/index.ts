@@ -6,7 +6,8 @@ export const mapUserTxToResponse = (data: any): BaseTransactionDto => ({
   ref: data.ref,
   amount: data.amount,
   currency: data.currency,
-  status: data.txStatus,
+  status: data.Status,
   createdAt: data.createdAt,
   userId: data.userId,
+  productId: data.productId,
 });

@@ -1,127 +1,160 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import axios from 'axios';
+import { PaystackPayload, PaystackResponse } from '../dto/paystack.dto';
+import { Currency, TransactionStatus } from 'src/common/enums/payment.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import axios from 'axios';
-import { ConfigService } from '@nestjs/config';
+import { Product } from 'src/dal/entities/product.entity';
 import { PaymentTransaction } from 'src/dal/entities/payment-transaction.entity';
-import {
-  PaystackInitResponseDto,
-  PaystackVerifyResponseDto,
-  PaystackWebhookDto,
-  PaystackPayload,
-} from '../dto/paystack.dto';
-import { TransactionStatus } from 'src/common/enums/payment.enum';
-import * as crypto from 'crypto';
+import { createHmac } from 'crypto';
 
 @Injectable()
 export class PaystackService {
-  private readonly paystackBaseUrl: string;
-  private readonly paystackSecretKey: string;
+  private baseUrl: string;
+  private headers: any;
   private readonly logger = new Logger(PaystackService.name);
 
   constructor(
-    private readonly configService: ConfigService,
+    @InjectRepository(Product)
+    private readonly productRepo: Repository<Product>,
+
     @InjectRepository(PaymentTransaction)
-    private readonly paymentsRepo: Repository<PaymentTransaction>,
+    private readonly paymentTransactionRepo: Repository<PaymentTransaction>,
   ) {
-    this.paystackBaseUrl = this.configService.get<string>('PAYSTACK_BASE_URL');
-    this.paystackSecretKey = this.configService.get<string>('PAYSTACK_SECRET_KEY');
+    this.baseUrl = 'https://api.paystack.co';
+    this.headers = {
+      Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+      'Content-Type': 'application/json',
+    };
   }
 
-  async initializePayment(userId: string, payload: PaystackPayload): Promise<PaystackInitResponseDto> {
+  async verify(reference: string): Promise<PaystackResponse> {
+    const { data } = await axios.get(
+      `${this.baseUrl}/transaction/verify/${reference}`,
+      { headers: this.headers },
+    );
+
+    if (data.status !== true) {
+      throw new InternalServerErrorException('Unable to verify transaction');
+    }
+
+    const {
+      data: { amount, status, fees, id },
+      message,
+    } = data;
+
+    return {
+      id,
+      status,
+      amount: +amount / 100,
+      message,
+      fee: +fees / 100,
+    };
+  }
+
+  async initiate(req: PaystackPayload): Promise<any> {
+    const { amount, ref, email, redirectUrl, planCode, productId } = req;
+
+    const product = await this.productRepo.findOne({ where: { id: productId } });
+    if (!product) {
+      throw new NotFoundException(`Product with id ${productId} not found`);
+    }
+
+    if (product.amount > amount) {
+      throw new BadRequestException(
+        `Invalid amount: product price is ${product.amount}, but got ${amount}`,
+      );
+    }
+
+    const payload = {
+      currency: Currency.NGN,
+      amount: +amount * 100,
+      reference: ref,
+      email,
+      callback_url: redirectUrl,
+      plan: planCode,
+      channels: ['card'],
+    };
+
     try {
-      
-      const reference = `PSK_${Date.now()}`;
-
-      const transaction = this.paymentsRepo.create({
-        user: { id: userId },
-        amount: payload.amount,
-        currency: 'NGN',
-        status: TransactionStatus.Pending,
-        reference,
-        metadata: { planCode: payload.planCode, redirectUrl: payload.redirectUrl },
-      });
-      await this.paymentsRepo.save(transaction);
-
-
-      const body = {
-        email: payload.email,
-        amount: payload.amount * 100, 
-        reference,
-        callback_url: payload.redirectUrl,
-        channels: payload.channels || ['card', 'bank'],
-        plan: payload.planCode,
-      };
-
-      const response = await axios.post(`${this.paystackBaseUrl}/transaction/initialize`, body, {
-        headers: { Authorization: `Bearer ${this.paystackSecretKey}` },
-      });
-
-
-      return {
-        status: true,
-        message: 'Authorization URL created',
-        data: {
-          authorization_url: response.data.data.authorization_url,
-          access_code: response.data.data.access_code,
-          reference,
-        },
-      } as PaystackInitResponseDto;
+      const { data } = await axios.post(
+        `${this.baseUrl}/transaction/initialize`,
+        payload,
+        { headers: this.headers },
+      );
+      return data;
     } catch (error: any) {
-      this.logger.error('Error initializing payment', error?.message);
-      throw new BadRequestException('Failed to initialize payment');
+      this.logger.error(error?.response?.data || error?.message);
+      throw new InternalServerErrorException('Unable to initiate payment');
     }
   }
 
-  async verifyPayment(reference: string): Promise<PaystackVerifyResponseDto> {
-    try {
-      const response = await axios.get(`${this.paystackBaseUrl}/transaction/verify/${reference}`, {
-        headers: { Authorization: `Bearer ${this.paystackSecretKey}` },
-      });
-
-
-      const transaction = await this.paymentsRepo.findOne({ where: { reference } });
-      if (transaction && response.data.data.status === 'success') {
-        transaction.status = TransactionStatus.Success;
-        await this.paymentsRepo.save(transaction);
-      }
-
-      return response.data as PaystackVerifyResponseDto;
-    } catch (error: any) {
-      this.logger.error('Error verifying payment', error?.message);
-      throw new BadRequestException('Failed to verify payment');
-    }
+  async verifyPayment(reference: string) {
+    return this.verify(reference);
   }
 
-  async handleWebhook(signature: string, rawBody: string): Promise<{ received: boolean }> {
+  async handleWebhook(signature: string, rawBody: Buffer) {
     try {
-      const hash = crypto.createHmac('sha512', this.paystackSecretKey).update(rawBody).digest('hex');
+      const secret = process.env.PAYSTACK_SECRET_KEY;
+      const hash = createHmac('sha512', secret).update(rawBody).digest('hex');
 
       if (hash !== signature) {
         this.logger.warn('Invalid Paystack signature');
-        return { received: false };
+        throw new BadRequestException('Invalid signature');
       }
 
-      const payload: PaystackWebhookDto = JSON.parse(rawBody);
-      this.logger.log(`Verified event: ${payload.event}`);
+      const payload = JSON.parse(rawBody.toString());
+      this.logger.log(`Webhook event received: ${payload.event}`);
 
-      if (payload.event === 'charge.success') {
-        const reference = payload.data.reference;
-        const transaction = await this.paymentsRepo.findOne({ where: { reference } });
+      if (payload.event !== 'charge.success') {
+        return { message: 'Ignored non-payment event' };
+      }
 
-        if (transaction) {
-          transaction.status = TransactionStatus.Success;
-          await this.paymentsRepo.save(transaction);
-          this.logger.log(`Transaction ${reference} updated to SUCCESS`);
-        } else {
-          this.logger.warn(`Transaction ${reference} not found`);
+      const reference = payload.data.reference;
+
+      const transaction = await this.paymentTransactionRepo.findOne({
+        where: { id: reference },
+        relations: ['product'],
+      });
+
+      if (!transaction) {
+        this.logger.warn(`Transaction not found for ref: ${reference}`);
+        return { message: 'Transaction not found' };
+      }
+
+      if (transaction.status === TransactionStatus.Success) {
+        return { message: 'Transaction already processed' };
+      }
+
+      transaction.status = TransactionStatus.Success;
+      await this.paymentTransactionRepo.save(transaction);
+
+      if (transaction.productId) {
+        const product = await this.productRepo.findOne({
+          where: { id: transaction.productId},
+        });
+
+        if (product) {
+          if (product.stock && product.stock > 0) {
+            product.stock -= 1;
+            await this.productRepo.save(product);
+            this.logger.log(
+              `Product ${product.id} stock reduced. Remaining: ${product.stock}`,
+            );
+          }
         }
       }
 
-      return { received: true };
+      return { message: 'Payment successful and transaction updated' };
     } catch (error: any) {
-      this.logger.error('Error parsing webhook payload', error?.message);
-      return { received: false };
+      this.logger.error(error?.response?.data || error?.message);
+      throw new InternalServerErrorException('Webhook processing failed');
     }
   }
 }

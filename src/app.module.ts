@@ -17,7 +17,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { Cart } from './dal/entities/cart.entity';
 import { CartItem } from './dal/entities/cart-item.entity';
 import { CartModule } from './cart/cart.module';
-import { PaymentsModule } from './payments/payments.module';
+import { PaymentModule } from './payments/payment.module';
 import { PaymentTransaction } from './dal/entities/payment-transaction.entity';
 
 @Module({
@@ -48,7 +48,7 @@ import { PaymentTransaction } from './dal/entities/payment-transaction.entity';
     ProductsModule,
     CategoriesModule,
     CartModule,
-    PaymentsModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

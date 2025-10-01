@@ -9,7 +9,6 @@ import {
     HttpCode,
     Get,
     Query,
-    Res,
     ValidationPipe,
 } from '@nestjs/common';
 import {
@@ -18,29 +17,27 @@ import {
     ApiOperation,
     ApiResponse,
     ApiOkResponse,
-    ApiQuery,
     ApiBody,
 } from '@nestjs/swagger';
-import { PaymentsService } from './services/payments.service';
+import { PaymentService } from './services/payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentResponseDto } from './dto/payment-response.dto';
 import { PaystackWebhookDto } from './dto/paystack.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { Request, Response } from 'express';
 import { TransactionTotalsDto } from './dto/transaction-totals.dto';
 import { PaystackTransactionDto } from './dto/paystack-transactions.dto';
 import { ConfigService } from '@nestjs/config';
 import { AdminGuard } from 'src/admin/admin.guard';
 import { PageOptionsDto } from 'src/auth/dto/page-options.dto';
 import { PaystackService } from './services/paystack.service';
+import { Request } from 'express';
 
 @ApiTags('Payments')
 @Controller('payments')
-export class PaymentsController {
-    
+export class PaymentController {
     constructor(
-        private readonly paymentsService: PaymentsService,
-         private readonly paystackService: PaystackService,
+        private readonly paymentService: PaymentService,
+        private readonly paystackService: PaystackService,
         private readonly configService: ConfigService,
     ) { }
 
@@ -49,12 +46,21 @@ export class PaymentsController {
     @Post('/initialize')
     @ApiOperation({ summary: 'Initialize a payment' })
     @ApiResponse({ status: 201, type: PaymentResponseDto })
-    async initializePayment(@Req() request: Request, @Body() dto: CreatePaymentDto) {
-        const userId = (request as any).user.id;
-        return this.paystackService.initializePayment(userId, dto);
+    async initializePayment(
+        @Req() req: Request & { user: any },
+        @Body() dto: CreatePaymentDto,
+    ) {
+        const userId = req.user.id;
+
+        const payload = {
+            ...dto,
+            redirectUrl: this.configService.get('PAYSTACK_REDIRECT_URL'),
+        };
+
+        return this.paymentService.paystack(userId, payload);
     }
 
-    @Post('verify/:reference')
+    @Get('verify/:reference')
     @ApiOperation({ summary: 'Verify a payment by reference' })
     @ApiResponse({ status: 200, type: PaymentResponseDto })
     async verifyPayment(@Param('reference') reference: string) {
@@ -73,13 +79,12 @@ export class PaymentsController {
         return this.paystackService.handleWebhook(signature, req.rawBody);
     }
 
-
     @ApiOkResponse({ type: TransactionTotalsDto })
     @Get('/totals')
     @UseGuards(AdminGuard)
     @ApiBearerAuth('admin-token')
     async getTransactionTotals() {
-        return this.paymentsService.getTransactionTotals();
+        return this.paymentService.getTransactionTotals();
     }
 
     @ApiOkResponse({ type: [PaystackTransactionDto] })
@@ -89,11 +94,9 @@ export class PaymentsController {
     async fetchTransactions(
         @Query(new ValidationPipe({ transform: true })) pageOptions: PageOptionsDto,
     ) {
-        return this.paymentsService.fetchTransactions(pageOptions);
+        return this.paymentService.fetchTransactions(pageOptions);
     }
-
 }
-    function verifyPayment(arg0: any, reference: any, string: any) {
-        throw new Error('Function not implemented.');
-    }
+
+
 

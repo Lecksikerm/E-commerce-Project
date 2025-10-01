@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 import { TransactionStatus } from 'src/common/enums/payment.enum';
 
 export class PaystackInitResponseDto {
@@ -53,6 +54,7 @@ export class BaseTransactionDto {
   status: TransactionStatus;
   createdAt: Date;
   userId: string;
+  productId: string;
 }
 
 export class PaystackWebhookDto {
@@ -79,10 +81,11 @@ export class PaystackWebhookDto {
 export type PaystackPayload = {
   email?: string;
   amount: number;
-  ref?: string; 
+  ref?: string;
   redirectUrl?: string;
   channels?: string[];
   planCode?: string;
+  productId: string;
 }
 export type PaystackResponse = {
   id?: string;
@@ -90,7 +93,15 @@ export type PaystackResponse = {
   amount: number;
   message: string;
   fee?: number;
-};
+}
+export class PaystackPaymentDtoDto {
+  amount: number;
+  email: string;
+  redirectUrl: string;
+  productId?: string;
+}
+
+
 
 
 

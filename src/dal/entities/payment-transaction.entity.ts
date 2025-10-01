@@ -1,6 +1,7 @@
 import { Entity, Column, ManyToOne } from 'typeorm';
 import { Base } from './base.entity';
 import { User } from './user.entity';
+import { Product } from './product.entity';
 
 @Entity('payment_transactions')
 export class PaymentTransaction extends Base {
@@ -21,4 +22,16 @@ export class PaymentTransaction extends Base {
 
     @Column({ nullable: true })
     reference: string;
+    plan: any;
+
+    @Column({ nullable: true })
+    productId: string;
+
+    @Column({ nullable: true })
+    failureReason?: string
+
+    @ManyToOne(() => Product, (product) => product.transactions, { eager: true})
+    product: Product;
 }
+export { User };
+

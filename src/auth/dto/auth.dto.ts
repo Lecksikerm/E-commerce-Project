@@ -93,7 +93,7 @@ export class CreateProductDto {
 
 export class UpdateProductDto {
   @ApiPropertyOptional({ example: 'External SSD' })
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   name?: string;
 
