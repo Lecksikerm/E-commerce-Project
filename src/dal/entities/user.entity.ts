@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany } from 'typeorm';
 import { Base } from './base.entity';
 import { Product } from './product.entity';
 import { Cart } from './cart.entity';
+import { PaymentTransaction } from './payment-transaction.entity';
 
 @Entity({ name: 'users' })
 export class User extends Base {
@@ -25,8 +26,10 @@ export class User extends Base {
 
   @OneToMany(() => Cart, (cart) => cart.user)
   carts: Cart[];
-    transactions: any;
-  static email: string;
+  
+  @OneToMany(()=> PaymentTransaction, (transaction) => transaction.user)
+  transactions: PaymentTransaction[];
+  
 }
 
 

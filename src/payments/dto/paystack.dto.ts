@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 import { TransactionStatus } from 'src/common/enums/payment.enum';
 
 export class PaystackInitResponseDto {
@@ -100,6 +100,8 @@ export class PaystackPaymentDtoDto {
   email: string;
   productId?: string;
 }
+
+
 
 
 

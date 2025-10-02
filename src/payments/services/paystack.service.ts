@@ -67,9 +67,9 @@ export class PaystackService {
       throw new NotFoundException(`Product with id ${productId} not found`);
     }
 
-    if (product.amount > amount) {
+    if (product.price > amount) {
       throw new BadRequestException(
-        `Invalid amount: product price is ${product.amount}, but got ${amount}`,
+        `Invalid amount: product price is ${product.price}, but got ${amount}`,
       );
     }
 

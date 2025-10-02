@@ -20,7 +20,6 @@ export class Product extends Base {
   @Column({ type: 'text', nullable: true })
   description: string | null;
 
-
   @ManyToOne(() => Category, { nullable: true, eager: true })
   @JoinColumn({ name: 'categoryId' })
   category: Category;
@@ -28,13 +27,11 @@ export class Product extends Base {
   @Column({ type: 'uuid', nullable: true })
   categoryId?: string;
 
-
-  @ManyToOne(() => Admin, admin => admin.products, { eager: false })
+  @ManyToOne(() => Admin, (admin) => admin.products, { eager: false })
   @JoinColumn({ name: 'createdById' })
   createdBy: Admin;
-  amount: number;
-    transactions: any;
 }
+
 
 
 

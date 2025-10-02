@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { createHmac } from 'crypto';
+import { createHmac, UUID } from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 
 import { PaymentTransaction } from 'src/dal/entities/payment-transaction.entity';
@@ -37,11 +37,13 @@ export class PaymentService {
 
   async paystack(
     userId: string,
-    payload: PaystackPaymentDtoDto,
-  ): Promise<{
-    transaction: BaseTransactionDto;
-    paymentUrl: string;
-  }> {
+    payload: {
+      amount: number;
+      productId: string;
+      email: string;
+      redirectUrl: string;   
+    },
+  ): Promise<{ transaction: BaseTransactionDto; paymentUrl: string }> {
     const { redirectUrl, amount, email, productId } = payload;
 
     if (!productId) {
