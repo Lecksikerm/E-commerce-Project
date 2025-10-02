@@ -11,15 +11,15 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import bodyParser from 'body-parser';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
- app.use(bodyParser.json({
-    verify: (req: any, res, buf) => {
-      req.rawBody = buf.toString();  
-    },
-  }));    
+app.use(bodyParser.json({
+  verify: (req: any, _res, buf) => {
+    req.rawBody = buf;
+  },
+}))    
   const logger = new Logger('Bootstrap');
 
   const projectName = 'e-commerce';

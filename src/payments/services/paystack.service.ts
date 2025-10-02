@@ -60,7 +60,7 @@ export class PaystackService {
   }
 
   async initiate(req: PaystackPayload): Promise<any> {
-    const { amount, ref, email, redirectUrl, planCode, productId } = req;
+    const { amount, ref, email, redirectUrl, productId } = req;
 
     const product = await this.productRepo.findOne({ where: { id: productId } });
     if (!product) {
@@ -79,7 +79,6 @@ export class PaystackService {
       reference: ref,
       email,
       callback_url: redirectUrl,
-      plan: planCode,
       channels: ['card'],
     };
 
@@ -120,7 +119,7 @@ export class PaystackService {
       const reference = payload.data.reference;
 
       const transaction = await this.paymentTransactionRepo.findOne({
-        where: { id: reference },
+        where: {  reference },
         relations: ['product'],
       });
 

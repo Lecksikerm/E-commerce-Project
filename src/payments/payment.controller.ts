@@ -31,6 +31,7 @@ import { AdminGuard } from 'src/admin/admin.guard';
 import { PageOptionsDto } from 'src/auth/dto/page-options.dto';
 import { PaystackService } from './services/paystack.service';
 import { Request } from 'express';
+import { Any } from 'typeorm';
 
 @ApiTags('Payments')
 @Controller('payments')
@@ -44,9 +45,9 @@ export class PaymentController {
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('user-token')
     @Post('/initiate')
-    @ApiOperation({ summary: 'Initialize a payment' })
+    @ApiOperation({ summary: 'Initiate a payment' })
     @ApiResponse({ status: 201, type: PaymentResponseDto })
-    async initializePayment(
+    async initiatePayment(
         @Req() req: Request & { user: any },
         @Body() dto: CreatePaymentDto,
     ) {
@@ -54,6 +55,7 @@ export class PaymentController {
 
         const payload = {
             ...dto,
+            email: req.user.email,
             redirectUrl: this.configService.get('PAYSTACK_REDIRECT_URL'),
         };
 
@@ -76,8 +78,14 @@ export class PaymentController {
         @Headers('x-paystack-signature') signature: string,
         @Req() req: any,
     ) {
+        if (!req.rawBody) {
+            console.error('Webhook rawBody is missing');
+            return { message: 'Invalid request: no raw body received' };
+        }
+
         return this.paystackService.handleWebhook(signature, req.rawBody);
     }
+
 
     @ApiOkResponse({ type: TransactionTotalsDto })
     @Get('/totals')

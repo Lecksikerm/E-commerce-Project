@@ -8,15 +8,3 @@ export enum TransactionStatus {
     Failed = 'failed',
 }
 
-export enum CampaignSatatus {
-  Active = 'active',
-  Inactive = 'inactive',
-  Completed = 'completed',
-}
-
-export enum AnalyticsType {
-  Click = 'click',
-  View = 'view',
-  Engagement = 'engagement',
-  Reach = 'reach',
-}

@@ -79,10 +79,10 @@ export class PaystackWebhookDto {
   };
 }
 export type PaystackPayload = {
-  email?: string;
+  email: string;
   amount: number;
-  ref?: string;
-  redirectUrl?: string;
+  ref: string;
+  redirectUrl: string;
   channels?: string[];
   planCode?: string;
   productId: string;
@@ -96,8 +96,8 @@ export type PaystackResponse = {
 }
 export class PaystackPaymentDtoDto {
   amount: number;
-  email: string;
   redirectUrl: string;
+  email: string;
   productId?: string;
 }
 
