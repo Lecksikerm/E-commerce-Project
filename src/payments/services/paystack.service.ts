@@ -16,6 +16,7 @@ import { createHmac } from 'crypto';
 
 @Injectable()
 export class PaystackService {
+  
   private baseUrl: string;
   private headers: any;
   private readonly logger = new Logger(PaystackService.name);
@@ -157,5 +158,30 @@ export class PaystackService {
       throw new InternalServerErrorException('Webhook processing failed');
     }
   }
+  async listTransactions(params: { perPage?: number; page?: number }) {
+  try {
+    const { perPage = 10, page = 1 } = params;
+
+    const { data } = await axios.get(
+      `${this.baseUrl}/transaction`,
+      {
+        headers: this.headers,
+        params: {
+          perPage,
+          page,
+        },
+      },
+    );
+
+    if (data.status !== true) {
+      throw new InternalServerErrorException('Unable to fetch transactions');
+    }
+
+    return data;
+  } catch (error: any) {
+    this.logger.error(error?.response?.data || error?.message);
+    throw new InternalServerErrorException('Error fetching transactions from Paystack');
+  }
 }
 
+}

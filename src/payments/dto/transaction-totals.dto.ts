@@ -7,6 +7,7 @@ export class TransactionTotalsDto {
   @ApiProperty({ example: 'Transaction totals' })
   message: string;
 
+
   @ApiProperty({
     example: {
       total_transactions: 42670,

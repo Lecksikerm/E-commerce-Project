@@ -43,7 +43,7 @@ export class PaymentController {
 
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('user-token')
-    @Post('/initialize')
+    @Post('/initiate')
     @ApiOperation({ summary: 'Initialize a payment' })
     @ApiResponse({ status: 201, type: PaymentResponseDto })
     async initializePayment(
@@ -96,6 +96,7 @@ export class PaymentController {
     ) {
         return this.paymentService.fetchTransactions(pageOptions);
     }
+
 }
 
 
