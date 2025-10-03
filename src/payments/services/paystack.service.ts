@@ -16,7 +16,7 @@ import { createHmac } from 'crypto';
 
 @Injectable()
 export class PaystackService {
-  
+
   private baseUrl: string;
   private headers: any;
   private readonly logger = new Logger(PaystackService.name);
@@ -54,29 +54,18 @@ export class PaystackService {
       id,
       status,
       amount: +amount / 100,
-      fee: fee/ 100,
+      fee: fee / 100,
       paid_at: data.paid_at,
       reference: data.reference,
       currency: data.currency,
-       customer: {
-      email: data.customer.email,
-    }
+      customer: {
+        email: data.customer.email,
+      }
     };
   }
 
   async initiate(req: PaystackPayloadDto): Promise<any> {
-    const { amount, ref, email, redirectUrl, productId } = req;
-
-    const product = await this.productRepo.findOne({ where: { id: productId } });
-    if (!product) {
-      throw new NotFoundException(`Product with id ${productId} not found`);
-    }
-
-    if (product.price > amount) {
-      throw new BadRequestException(
-        `Invalid amount: product price is ${product.price}, but got ${amount}`,
-      );
-    }
+    const { amount, ref, email, redirectUrl } = req;
 
     const payload = {
       currency: Currency.NGN,
@@ -91,11 +80,14 @@ export class PaystackService {
       const { data } = await axios.post(
         `${this.baseUrl}/transaction/initialize`,
         payload,
-        { headers: this.headers },
+        {
+          headers: this.headers,
+        },
       );
+
       return data;
-    } catch (error: any) {
-      this.logger.error(error?.response?.data || error?.message);
+    } catch (error) {
+      this.logger.error(error);
       throw new InternalServerErrorException('Unable to initiate payment');
     }
   }
@@ -124,7 +116,7 @@ export class PaystackService {
       const reference = payload.data.reference;
 
       const transaction = await this.paymentTransactionRepo.findOne({
-        where: {  reference },
+        where: { reference },
         relations: ['product'],
       });
 
@@ -142,7 +134,7 @@ export class PaystackService {
 
       if (transaction.productId) {
         const product = await this.productRepo.findOne({
-          where: { id: transaction.productId},
+          where: { id: transaction.productId },
         });
 
         if (product) {
@@ -163,29 +155,29 @@ export class PaystackService {
     }
   }
   async listTransactions(params: { perPage?: number; page?: number }) {
-  try {
-    const { perPage = 10, page = 1 } = params;
+    try {
+      const { perPage = 10, page = 1 } = params;
 
-    const { data } = await axios.get(
-      `${this.baseUrl}/transaction`,
-      {
-        headers: this.headers,
-        params: {
-          perPage,
-          page,
+      const { data } = await axios.get(
+        `${this.baseUrl}/transaction`,
+        {
+          headers: this.headers,
+          params: {
+            perPage,
+            page,
+          },
         },
-      },
-    );
+      );
 
-    if (data.status !== true) {
-      throw new InternalServerErrorException('Unable to fetch transactions');
+      if (data.status !== true) {
+        throw new InternalServerErrorException('Unable to fetch transactions');
+      }
+
+      return data;
+    } catch (error: any) {
+      this.logger.error(error?.response?.data || error?.message);
+      throw new InternalServerErrorException('Error fetching transactions from Paystack');
     }
-
-    return data;
-  } catch (error: any) {
-    this.logger.error(error?.response?.data || error?.message);
-    throw new InternalServerErrorException('Error fetching transactions from Paystack');
   }
-}
 
 }

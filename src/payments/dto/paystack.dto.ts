@@ -162,7 +162,6 @@ export class PaystackWebhookDto {
   data: PaystackWebhookData;
 }
 
-// ---------- Payload ----------
 export class PaystackPayloadDto {
   @ApiProperty({ example: 'user@example.com' })
   @IsEmail()
@@ -185,16 +184,10 @@ export class PaystackPayloadDto {
   @IsString({ each: true })
   channels?: string[];
 
-  @ApiProperty({ example: 'PLN_xxx', required: false })
-  @IsOptional()
-  @IsString()
-  planCode?: string;
-
   @ApiProperty({ example: 'uuid-of-product' })
   @IsUUID()
   productId: string;
 }
-
 export class PaystackResponseDto {
   @ApiProperty({ example: 'uuid', required: false })
   @IsNotEmpty()

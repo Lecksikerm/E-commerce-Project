@@ -41,10 +41,11 @@ export class PaymentService {
       amount: number;
       productId: string;
       email: string;
-      redirectUrl: string;   
+      redirectUrl: string;
+         
     },
   ): Promise<{ transaction: BaseTransactionDto; paymentUrl: string }> {
-    const { redirectUrl, amount, email, productId } = payload;
+    const { redirectUrl, amount, email, productId,  } = payload;
 
     if (!productId) {
       throw new BadRequestException('productId is required');

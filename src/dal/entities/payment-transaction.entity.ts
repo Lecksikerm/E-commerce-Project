@@ -32,6 +32,8 @@ export class PaymentTransaction extends Base {
 
   @ManyToOne(() => Product, (product) => product.transactions, { eager: true })
   product: Product;
+
+  @Column({ nullable: true })
   channel: string;
 }
 export { User };
