@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { PaymentTransaction } from 'src/dal/entities/payment-transaction.entity';
 import { Product } from 'src/dal/entities/product.entity';
 import { TransactionStatus } from 'src/common/enums/payment.enum';
-import { BaseTransactionDto, PaystackPaymentDtoDto } from '../dto/paystack.dto';
+import { BaseTransactionDto, PaystackPaymentDto } from '../dto/paystack.dto';
 import { PaystackService } from './paystack.service';
 import { mapUserTxToResponse } from '../mapper';
 import { PaystackTransactionDto } from '../dto/paystack-transactions.dto';

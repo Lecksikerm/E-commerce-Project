@@ -6,7 +6,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import axios from 'axios';
-import { PaystackPayload, PaystackResponse } from '../dto/paystack.dto';
+import { PaystackPayloadDto, PaystackVerifyResponseData, PaystackVerifyResponseDto, } from '../dto/paystack.dto';
 import { Currency, TransactionStatus } from 'src/common/enums/payment.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -35,7 +35,7 @@ export class PaystackService {
     };
   }
 
-  async verify(reference: string): Promise<PaystackResponse> {
+  async verify(reference: string): Promise<PaystackVerifyResponseData> {
     const { data } = await axios.get(
       `${this.baseUrl}/transaction/verify/${reference}`,
       { headers: this.headers },
@@ -46,7 +46,7 @@ export class PaystackService {
     }
 
     const {
-      data: { amount, status, fees, id },
+      data: { amount, status, fee, id },
       message,
     } = data;
 
@@ -54,12 +54,17 @@ export class PaystackService {
       id,
       status,
       amount: +amount / 100,
-      message,
-      fee: +fees / 100,
+      fee: fee/ 100,
+      paid_at: data.paid_at,
+      reference: data.reference,
+      currency: data.currency,
+       customer: {
+      email: data.customer.email,
+    }
     };
   }
 
-  async initiate(req: PaystackPayload): Promise<any> {
+  async initiate(req: PaystackPayloadDto): Promise<any> {
     const { amount, ref, email, redirectUrl, productId } = req;
 
     const product = await this.productRepo.findOne({ where: { id: productId } });
