@@ -13,4 +13,5 @@ export class PageDto<T> {
     this.total = total;
     this.data = data;
   }
+
 }
