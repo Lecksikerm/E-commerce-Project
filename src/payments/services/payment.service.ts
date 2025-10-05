@@ -47,10 +47,6 @@ export class PaymentService {
   ): Promise<{ transaction: BaseTransactionDto; paymentUrl: string }> {
     const { redirectUrl, amount, email, productId,  } = payload;
 
-    if (!productId) {
-      throw new BadRequestException('productId is required');
-    }
-
     const product = await this.productRepo.findOne({ where: { id: productId } });
     if (!product) {
       throw new NotFoundException(`Product with id ${productId} not found`);

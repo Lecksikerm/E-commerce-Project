@@ -62,14 +62,14 @@ export class PaymentController {
         return this.paymentService.paystack(userId, payload);
     }
 
-    @Get('/verify/:reference')
+    @Get('/paystack/verify/:reference')
     @ApiOperation({ summary: 'Verify a payment by reference' })
     @ApiResponse({ status: 200, type: PaymentResponseDto })
     async verifyPayment(@Param('reference') reference: string) {
         return this.paystackService.verifyPayment(reference);
     }
 
-    @Post('/webhook')
+    @Post('/paystack/webhook')
     @HttpCode(200)
     @ApiOperation({ summary: 'Paystack Webhook Handler' })
     @ApiBody({ type: PaystackWebhookDto })
