@@ -8,7 +8,7 @@ class Value {
 
 class ProductService {
   value: string | undefined;
-  type: string | undefined; // static or dynamic
+  type: string | undefined; 
 }
 
 @Entity({ name: 'meta-data' })
