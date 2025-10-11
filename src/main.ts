@@ -7,9 +7,9 @@ if (typeof globalThis.crypto === 'undefined') {
   globalThis.crypto = cryptoModule.webcrypto || cryptoModule;
 }
 
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe, Logger } from '@nestjs/common';
+import { ValidationPipe, Logger, ClassSerializerInterceptor } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
 
@@ -33,6 +33,9 @@ app.use(bodyParser.json({
       transform: true,
     }),
   );
+
+  const reflector = app.get(Reflector);
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('E-Commerce API')

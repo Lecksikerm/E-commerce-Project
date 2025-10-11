@@ -24,6 +24,7 @@ import { TransactionTotalsDto } from '../dto/transaction-totals.dto';
 @Injectable()
 export class PaymentService {
   private readonly logger = new Logger(PaymentService.name);
+  ordersRepo: any;
 
   constructor(
     @InjectRepository(Product)

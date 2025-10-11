@@ -14,10 +14,10 @@ import { PassportAuthController } from './controllers/passport-auth-controller';
   imports: [
     forwardRef(() => UsersModule),
 
-    //Registers Passport with "jwt" as default strategy
+    
     PassportModule.register({ defaultStrategy: 'jwt' }),
 
-    //Registers JWT with consistent secret + expiry
+    
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'my-super-secret-key',
       signOptions: { expiresIn: '1d' },
