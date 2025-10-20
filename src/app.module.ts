@@ -30,27 +30,22 @@ import { OrdersModule } from './orders/orders.module';
       ignoreEnvFile: process.env.NODE_ENV === 'production',
     }),
 
-    //  Configure TypeORM
-    TypeOrmModule.forRootAsync({
-      useFactory: () => ({
-        type: 'postgres',
-        host: process.env.DB_HOST || 'localhost',
-        port: parseInt(process.env.DB_PORT || '5432', 10),
-        username: process.env.DB_USER || 'postgres',
-        password: process.env.DB_PASS || 'postgres',
-        database: process.env.DB_NAME || 'e-commerce',
-        entities: [User, Admin, Product, Category, Cart, CartItem, PaymentTransaction, Order],
-        synchronize: false,
-        migrations: ["dist/migrations/*.js"],
-        logging: true,
-      }),
-    }),
-
-    UsersModule,
-    AuthModule,
-    AdminModule,
-    ProductsModule,
-    CategoriesModule,
+  TypeOrmModule.forRootAsync({
+  useFactory: () => ({
+    type: 'postgres',
+    url: process.env.DATABASE_URL, 
+    autoLoadEntities: true,
+    synchronize: false,
+    migrations: ['dist/migrations/*.js'],
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    logging: true,
+  }),
+}),
+  UsersModule,
+  AuthModule,
+  AdminModule,
+  ProductsModule,
+  CategoriesModule,
     CartModule,
     PaymentModule,
     OrdersModule,
