@@ -23,7 +23,7 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   const projectName = 'e-commerce';
-  const port = process.env.PORT || 8000;
+  const port = process.env.PORT || 3000;
 
 
   app.useGlobalPipes(
@@ -59,7 +59,7 @@ async function bootstrap() {
     swaggerOptions: { persistAuthorization: true },
   });
 
-  await app.listen(port, '0.0.0.0');
+  await app.listen(process.env.PORT || 3000, '0.0.0.0');
 
   logger.log('--------- Application Started ---------');
   logger.log(`Listening on http://localhost:${port}`);
