@@ -1,12 +1,9 @@
-// Polyfill for global crypto if missing (Node.js <18)
-if (typeof globalThis.crypto === 'undefined') {
-  // Use Node's webcrypto API if available (Node 15+)
-  // Fallback to legacy crypto if needed
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const cryptoModule = require('crypto');
-  globalThis.crypto = cryptoModule.webcrypto || cryptoModule;
-}
+// Polyfill for global crypto
+import { webcrypto } from 'node:crypto';
 
+if (!global.crypto) {
+  global.crypto = webcrypto;
+}
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, Logger, ClassSerializerInterceptor } from '@nestjs/common';
@@ -14,18 +11,27 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
+  
+  // Enable CORS for development
+  app.enableCors();
+  
+  // Body parser config
   app.use(bodyParser.json({
     verify: (req: any, _res, buf) => {
       req.rawBody = buf;
     },
-  }))
-  const logger = new Logger('Bootstrap');
+  }));
 
-  const projectName = 'e-commerce';
   const port = process.env.PORT || 3000;
+  const isDev = process.env.NODE_ENV !== 'production';
 
-
+  // Log startup environment
+  logger.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  logger.log(`Database URL: ${process.env.DATABASE_URL ? '(using connection string)' : '(using individual params)'}`);
+  
+  // Global pipes
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: false,
@@ -37,33 +43,39 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
 
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('E-Commerce API')
-    .setDescription('API documentation for the e-commerce project')
-    .setVersion('1.0')
+  // Swagger setup
+  if (isDev) {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('E-Commerce API')
+      .setDescription('API documentation for the e-commerce project')
+      .setVersion('1.0')
+      .addBearerAuth(
+        { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+        'user-token',
+      )
+      .addBearerAuth(
+        { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+        'admin-token',
+      )
+      .build();
 
-    .addBearerAuth(
-      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
-      'user-token',
-    )
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('swagger', app, document, {
+      swaggerOptions: { persistAuthorization: true },
+    });
+  }
 
-    .addBearerAuth(
-      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
-      'admin-token',
-    )
-    .build();
+  // Start server
+  await app.listen(port, '0.0.0.0');
 
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-
-  SwaggerModule.setup('swagger', app, document, {
-    swaggerOptions: { persistAuthorization: true },
-  });
-
-  await app.listen(process.env.PORT || 3000, '0.0.0.0');
-
+  // Log startup info
   logger.log('--------- Application Started ---------');
-  logger.log(`Listening on http://localhost:${port}`);
-  logger.log(`Swagger Docs available at http://localhost:${port}/swagger`);
+  logger.log(`Mode: ${isDev ? 'Development' : 'Production'}`);
+  logger.log(`Running on port: ${port}`);
+  logger.log(`Server: ${await app.getUrl()}`);
+  if (isDev) {
+    logger.log(`Swagger Docs: ${await app.getUrl()}/swagger`);
+  }
 }
 
 bootstrap();
