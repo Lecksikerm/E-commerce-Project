@@ -27,6 +27,7 @@ import { OrdersModule } from './orders/orders.module';
 
     ConfigModule.forRoot({
       isGlobal: true,
+      ignoreEnvFile: process.env.NODE_ENV === 'production',
     }),
 
     //  Configure TypeORM
