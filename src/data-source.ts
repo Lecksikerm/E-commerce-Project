@@ -40,7 +40,7 @@ const config: DataSourceOptions = {
         PaymentTransaction,
         Order,
     ],
-    // support TS when running with ts-node (dev) and JS when running built code (prod)
+    
     migrations: ['src/migrations/*.ts', 'dist/migrations/*.js'],
     subscribers: [],
 };

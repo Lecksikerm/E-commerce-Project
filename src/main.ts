@@ -15,11 +15,11 @@ import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-app.use(bodyParser.json({
-  verify: (req: any, _res, buf) => {
-    req.rawBody = buf;
-  },
-}))    
+  app.use(bodyParser.json({
+    verify: (req: any, _res, buf) => {
+      req.rawBody = buf;
+    },
+  }))
   const logger = new Logger('Bootstrap');
 
   const projectName = 'e-commerce';
@@ -41,7 +41,7 @@ app.use(bodyParser.json({
     .setTitle('E-Commerce API')
     .setDescription('API documentation for the e-commerce project')
     .setVersion('1.0')
-    
+
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
       'user-token',
@@ -59,7 +59,7 @@ app.use(bodyParser.json({
     swaggerOptions: { persistAuthorization: true },
   });
 
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 
   logger.log('--------- Application Started ---------');
   logger.log(`Listening on http://localhost:${port}`);
