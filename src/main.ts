@@ -66,7 +66,7 @@ async function bootstrap() {
   }
 
   // Start server
-  await app.listen(port, '0.0.0.0');
+   await app.listen(process.env.PORT || 3000, '0.0.0.0');
 
   // Log startup info
   logger.log('--------- Application Started ---------');
