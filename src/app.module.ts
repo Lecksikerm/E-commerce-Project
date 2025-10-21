@@ -18,29 +18,29 @@ import { OrdersModule } from './orders/orders.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      ignoreEnvFile: process.env.NODE_ENV === 'production',
+      envFilePath: process.env.NODE_ENV === 'production' ? '.env' : '.env.local',
     }),
 
-  TypeOrmModule.forRootAsync({
-    useFactory: () => {
-      const isProduction = process.env.NODE_ENV === 'production';
-      const dbUrl = process.env.DATABASE_URL;
+    TypeOrmModule.forRootAsync({
+      useFactory: () => {
+        const isProduction = process.env.NODE_ENV === 'production';
+        const dbUrl = process.env.DATABASE_URL;
 
-      if (!dbUrl) {
-        throw new Error('DATABASE_URL is not set');
-      }
+        if (!dbUrl) {
+          throw new Error('DATABASE_URL is not set');
+        }
 
-      return {
-        type: 'postgres',
-        url: dbUrl,
-        autoLoadEntities: true,
-        synchronize: false,
-        migrations: ['dist/migrations/*.js'],
-        ssl: isProduction ? { rejectUnauthorized: false } : false,
-        logging: true,
-      };
-    },
-  }),
+        return {
+          type: 'postgres',
+          url: dbUrl,
+          autoLoadEntities: true,
+          synchronize: false,
+          migrations: ['dist/migrations/*.js'],
+          ssl: isProduction ? { rejectUnauthorized: false } : false,
+          logging: true,
+        };
+      },
+    }),
 
     UsersModule,
     AuthModule,
@@ -54,4 +54,4 @@ import { OrdersModule } from './orders/orders.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -8,17 +8,24 @@ import { Cart } from "./dal/entities/cart.entity";
 import { CartItem } from "./dal/entities/cart-item.entity";
 import { PaymentTransaction } from "./dal/entities/payment-transaction.entity";
 import { Order } from "./dal/entities/order.entity";
+const isProduction = process.env.NODE_ENV === "production";
+
+const dbUrl =
+  process.env.DATABASE_URL ||
+  `postgres://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
 
 export const dataSource = new DataSource({
   type: "postgres",
-  url: process.env.DATABASE_URL, // Use remote DB connection string
+  url: dbUrl,
   synchronize: false,
   logging: true,
   entities: [Product, Category, Admin, User, Cart, CartItem, PaymentTransaction, Order],
   migrations: ["dist/migrations/*.js"],
   subscribers: [],
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+  ssl: isProduction ? { rejectUnauthorized: false } : false,
 });
+
+
 
 
 
