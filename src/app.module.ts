@@ -21,25 +21,26 @@ import { OrdersModule } from './orders/orders.module';
       ignoreEnvFile: process.env.NODE_ENV === 'production',
     }),
 
-    TypeOrmModule.forRootAsync({
-      useFactory: () => ({
+  TypeOrmModule.forRootAsync({
+    useFactory: () => {
+      const isProduction = process.env.NODE_ENV === 'production';
+      const dbUrl = process.env.DATABASE_URL;
+
+      if (!dbUrl) {
+        throw new Error('DATABASE_URL is not set');
+      }
+
+      return {
         type: 'postgres',
-        url: process.env.DATABASE_URL || undefined, 
-        host: process.env.DB_HOST || '127.0.0.1',   
-        port: parseInt(process.env.DB_PORT, 10) || 5432,
-        username: process.env.DB_USER || 'postgres',
-        password: process.env.DB_PASS || 'postgres',
-        database: process.env.DB_NAME || 'e-commerce',
+        url: dbUrl,
         autoLoadEntities: true,
         synchronize: false,
         migrations: ['dist/migrations/*.js'],
-        ssl:
-          process.env.NODE_ENV === 'production'
-            ? { rejectUnauthorized: false }
-            : false,
+        ssl: isProduction ? { rejectUnauthorized: false } : false,
         logging: true,
-      }),
-    }),
+      };
+    },
+  }),
 
     UsersModule,
     AuthModule,

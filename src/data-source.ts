@@ -1,58 +1,27 @@
-import 'reflect-metadata';
-import { DataSource, DataSourceOptions } from 'typeorm';
-import { Product } from './dal/entities/product.entity';
-import { Category } from './dal/entities/category.entity';
-import { User } from './dal/entities/user.entity';
-import { Admin } from './dal/entities/admin.entity';
-import { Cart } from './dal/entities/cart.entity';
-import { CartItem } from './dal/entities/cart-item.entity';
-import { PaymentTransaction } from './dal/entities/payment-transaction.entity';
-import { Order } from './dal/entities/order.entity';
-import * as dotenv from 'dotenv';
+import "reflect-metadata";
+import { DataSource } from "typeorm";
+import { Product } from "./dal/entities/product.entity"; 
+import { Category } from "./dal/entities/category.entity"; 
+import { User } from "./dal/entities/user.entity";
+import { Admin } from "./dal/entities/admin.entity";
+import { Cart } from "./dal/entities/cart.entity";
+import { CartItem } from "./dal/entities/cart-item.entity";
+import { PaymentTransaction } from "./dal/entities/payment-transaction.entity";
+import { Order } from "./dal/entities/order.entity";
 
-dotenv.config();
+export const dataSource = new DataSource({
+  type: "postgres",
+  url: process.env.DATABASE_URL, // Use remote DB connection string
+  synchronize: false,
+  logging: true,
+  entities: [Product, Category, Admin, User, Cart, CartItem, PaymentTransaction, Order],
+  migrations: ["dist/migrations/*.js"],
+  subscribers: [],
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+});
 
-const isProd = process.env.NODE_ENV === 'production';
 
-const config: DataSourceOptions = {
-    type: 'postgres',
-    ...(process.env.DATABASE_URL
-        ? {
-            url: process.env.DATABASE_URL,
-            ssl: isProd ? {
-                rejectUnauthorized: false,
-            } : false,
-            extra: {
-                poolSize: 5,
-                max: 20,
-                connectionTimeoutMillis: 10000,
-            },
-        }
-        : {
-            host: process.env.DB_HOST || 'localhost',
-            port: parseInt(process.env.DB_PORT || '5432', 10),
-            username: process.env.DB_USER || 'postgres',
-            password: process.env.DB_PASS || 'postgres',
-            database: process.env.DB_NAME || 'e-commerce',
-        }),
-    synchronize: false,
-    logging: !isProd,
-    entities: [
-        Product,
-        Category,
-        Admin,
-        User,
-        Cart,
-        CartItem,
-        PaymentTransaction,
-        Order,
-    ],
-    migrations: ['dist/migrations/*.js'],
-    migrationsRun: isProd,
-    subscribers: [],
-};
 
-export const dataSource = new DataSource(config);
 
 
 
