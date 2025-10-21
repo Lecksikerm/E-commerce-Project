@@ -12,13 +12,20 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
+const isProd = process.env.NODE_ENV === 'production';
+
 const config: DataSourceOptions = {
     type: 'postgres',
     ...(process.env.DATABASE_URL
         ? {
             url: process.env.DATABASE_URL,
-            ssl: {
+            ssl: isProd ? {
                 rejectUnauthorized: false,
+            } : false,
+            extra: {
+                poolSize: 5,
+                max: 20,
+                connectionTimeoutMillis: 10000,
             },
         }
         : {
@@ -29,7 +36,7 @@ const config: DataSourceOptions = {
             database: process.env.DB_NAME || 'e-commerce',
         }),
     synchronize: false,
-    logging: true,
+    logging: !isProd,
     entities: [
         Product,
         Category,
@@ -40,11 +47,11 @@ const config: DataSourceOptions = {
         PaymentTransaction,
         Order,
     ],
-    
-    migrations: ['src/migrations/*.ts', 'dist/migrations/*.js'],
+    migrations: ['dist/migrations/*.js'],
+    migrationsRun: isProd,
     subscribers: [],
 };
- 
+
 export const dataSource = new DataSource(config);
 
 
