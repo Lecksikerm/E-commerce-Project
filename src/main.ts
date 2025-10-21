@@ -1,3 +1,7 @@
+// Load environment variables from .env first
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 // Polyfill for global crypto
 import { webcrypto } from 'node:crypto';
 
