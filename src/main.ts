@@ -14,10 +14,9 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
   
-  // Enable CORS for development
-  app.enableCors();
   
-  // Body parser config
+  app.enableCors();
+
   app.use(bodyParser.json({
     verify: (req: any, _res, buf) => {
       req.rawBody = buf;
@@ -27,11 +26,9 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   const isDev = process.env.NODE_ENV !== 'production';
 
-  // Log startup environment
   logger.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   logger.log(`Database URL: ${process.env.DATABASE_URL ? '(using connection string)' : '(using individual params)'}`);
   
-  // Global pipes
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: false,
@@ -43,7 +40,7 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
 
-  // Swagger setup
+ 
   if (isDev) {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('E-Commerce API')
@@ -65,10 +62,8 @@ async function bootstrap() {
     });
   }
 
-  // Start server
-   await app.listen(process.env.PORT || 3000, '0.0.0.0');
+  await app.listen(port);
 
-  // Log startup info
   logger.log('--------- Application Started ---------');
   logger.log(`Mode: ${isDev ? 'Development' : 'Production'}`);
   logger.log(`Running on port: ${port}`);
