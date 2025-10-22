@@ -8,6 +8,7 @@
   "scripts": {
     "prebuild": "npm install -g @nestjs/cli",
     "build": "nest build",
+    "vercel-build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/main",
     "start:dev": "nest start --watch",
