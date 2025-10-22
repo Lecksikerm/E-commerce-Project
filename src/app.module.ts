@@ -18,7 +18,6 @@ import { OrdersModule } from './orders/orders.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV === 'production' ? '.env' : '.env.local',
     }),
 
     TypeOrmModule.forRootAsync({
@@ -35,7 +34,9 @@ import { OrdersModule } from './orders/orders.module';
           url: dbUrl,
           autoLoadEntities: true,
           synchronize: false,
-          migrations: ['dist/migrations/*.js'],
+          migrations: isProduction
+            ? ['dist/migrations/*.js']
+            : ['src/migrations/*.ts'],
           ssl: isProduction ? { rejectUnauthorized: false } : false,
           logging: true,
         };
@@ -54,4 +55,4 @@ import { OrdersModule } from './orders/orders.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

@@ -2,8 +2,9 @@ import { Controller, Post, Body, Get, Param, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CreateAdminDto, LoginAdminDto } from './admin.dto';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { AdminJwtAuthGuard } from 'src/auth/guards/admin-jwt.guard';
+
 import { AdminGuard } from './admin.guard';
+import { AdminJwtAuthGuard } from 'src/auth/guards/admin-jwt.guard';
 
 @ApiTags('Admin')
 @Controller('/admin')

@@ -3,9 +3,12 @@ dotenv.config();
 
 // Polyfill for global crypto
 import { webcrypto } from 'node:crypto';
-if (!global.crypto) {
-  global.crypto = webcrypto;
+
+if (!globalThis.crypto) {
+  (globalThis as any).crypto = webcrypto;
 }
+
+
 
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';

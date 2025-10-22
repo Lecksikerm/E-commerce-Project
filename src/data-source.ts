@@ -8,6 +8,7 @@ import { Cart } from "./dal/entities/cart.entity";
 import { CartItem } from "./dal/entities/cart-item.entity";
 import { PaymentTransaction } from "./dal/entities/payment-transaction.entity";
 import { Order } from "./dal/entities/order.entity";
+
 const isProduction = process.env.NODE_ENV === "production";
 
 const dbUrl =
@@ -20,15 +21,7 @@ export const dataSource = new DataSource({
   synchronize: false,
   logging: true,
   entities: [Product, Category, Admin, User, Cart, CartItem, PaymentTransaction, Order],
-  migrations: ["dist/migrations/*.js"],
+  migrations: isProduction ? ["dist/migrations/*.js"] : ["src/migrations/*.ts"],
   subscribers: [],
   ssl: isProduction ? { rejectUnauthorized: false } : false,
 });
-
-
-
-
-
-
-
-
