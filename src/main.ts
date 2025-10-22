@@ -1,24 +1,25 @@
-// Load environment variables from .env first
 import * as dotenv from 'dotenv';
 dotenv.config();
 
 // Polyfill for global crypto
 import { webcrypto } from 'node:crypto';
-
 if (!global.crypto) {
   global.crypto = webcrypto;
 }
+
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, Logger, ClassSerializerInterceptor } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
 
-async function bootstrap() {
+let server: any;
+const isDev = !process.env.VERCEL;
+
+async function createApp() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
-  
-  
+
   app.enableCors();
 
   app.use(bodyParser.json({
@@ -27,12 +28,6 @@ async function bootstrap() {
     },
   }));
 
-  const port = process.env.PORT || 3000;
-  const isDev = process.env.NODE_ENV !== 'production';
-
-  logger.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  logger.log(`Database URL: ${process.env.DATABASE_URL ? '(using connection string)' : '(using individual params)'}`);
-  
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: false,
@@ -44,7 +39,6 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
 
- 
   if (isDev) {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('E-Commerce API')
@@ -66,15 +60,27 @@ async function bootstrap() {
     });
   }
 
-  await app.listen(port);
-
-  logger.log('--------- Application Started ---------');
-  logger.log(`Mode: ${isDev ? 'Development' : 'Production'}`);
-  logger.log(`Running on port: ${port}`);
-  logger.log(`Server: ${await app.getUrl()}`);
-  if (isDev) {
-    logger.log(`Swagger Docs: ${await app.getUrl()}/swagger`);
-  }
+  return app;
 }
 
-bootstrap();
+if (process.env.VERCEL !== 'true') {
+  (async () => {
+    const app = await createApp();
+    const port = process.env.PORT || 3000;
+    await app.listen(port);
+    const logger = new Logger('Bootstrap');
+    logger.log(`Server running on http://localhost:${port}`);
+    logger.log(`Swagger enabled? ${isDev}`);
+
+  })();
+}
+
+export default async function handler(req: any, res: any) {
+  if (!server) {
+    const app = await createApp();
+    await app.init();
+    server = app.getHttpAdapter().getInstance();
+  }
+  return server(req, res);
+}
+
