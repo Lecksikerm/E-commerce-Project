@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
+import * as dotenv from "dotenv";
 import { Product } from "./dal/entities/product.entity"; 
 import { Category } from "./dal/entities/category.entity"; 
 import { User } from "./dal/entities/user.entity";
@@ -9,11 +10,16 @@ import { CartItem } from "./dal/entities/cart-item.entity";
 import { PaymentTransaction } from "./dal/entities/payment-transaction.entity";
 import { Order } from "./dal/entities/order.entity";
 
+// Load .env variables
+dotenv.config();
+
 const isProduction = process.env.NODE_ENV === "production";
 
 const dbUrl =
   process.env.DATABASE_URL ||
   `postgres://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
+
+console.log("Database URL:", dbUrl); 
 
 export const dataSource = new DataSource({
   type: "postgres",
